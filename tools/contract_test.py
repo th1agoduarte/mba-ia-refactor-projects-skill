@@ -10,7 +10,7 @@ Com --baseline, cada endpoint deve devolver o mesmo status do original (ou um do
 status explicitamente aceitos para endpoints perigosos que passam a exigir auth),
 e um 2xx com corpo JSON objeto precisa manter as chaves de topo do original, exceto
 chaves sensíveis que a refatoração deve remover (ex.: secret_key). Endpoints administrativos (ADMIN) são chamados sem e com
-X-Admin-Token (o app sobe com ADMIN_TOKEN no ambiente). A seção
+a credencial (X-Admin-Token e Authorization: Bearer; o app sobe com ADMIN_TOKEN). A seção
 "security" mostra vazamentos (senha/hash/secret) antes x depois.
 
 Só usa a biblioteca padrão. Sai com código 1 se algum endpoint quebrar.
@@ -141,7 +141,7 @@ PROJECTS = {
             ("POST", "/categories", {}, None),
             ("PUT", "/categories/1", {"description": "editada"}, None),
             ("DELETE", "/tasks/2", None, None),
-            ("DELETE", "/users/3", None, None),
+            ("DELETE", "/users/3", None, ADMIN),
             ("DELETE", "/categories/9999", None, None),
         ],
     },
@@ -206,7 +206,7 @@ def run(name: str, port: int | None = None) -> dict:
                          "status": status, "response": resp}
                 if kind == ADMIN and status in (401, 403):  # protegido: repete com a credencial
                     entry["status_token"], entry["response_token"] = call(
-                        base, method, path, body, {"X-Admin-Token": ADMIN_TOKEN})
+                        base, method, path, body, {"X-Admin-Token": ADMIN_TOKEN, "Authorization": f"Bearer {ADMIN_TOKEN}"})
                 results.append(entry)
         return {"project": spec["dir"], "command": " ".join(spec["cmd"]), "booted": booted,
                 "booted_alive": proc.poll() is None, "results": results}
