@@ -1,0 +1,13 @@
+Auditoria de dependências (pip-audit / npm audit --omit=dev), 2026-11-15
+
+code-smells-project   flask 3.1.1->3.1.3, flask-cors 5.0.1->6.0.5          8 CVEs -> 0
+task-manager-api      flask 3.0.0->3.1.3, flask-cors 4.0.0->6.0.5,
+                      python-dotenv 1.0.0->1.2.4                           12+ CVEs -> 0
+ecommerce-api-legacy  npm audit fix (express/body-parser/path-to-regexp/proxy-addr)
+                      sqlite3 ^5.1.6 -> ^6.0.1 (tar/node-gyp do build)     crít 2 alto 8 -> crít 0 alto 0
+                      resta 1 moderado: qs (via express 4, sem correção compatível)
+sqlite3 6 exige Node >= 20.17 (README atualizado).
+
+Depois da atualização: make setup && PORT=5157 make test
+  58 findings: 53 com o trecho conferido, 5 sem Evidence, 0 com divergência
+  31/31 · 7/7 · 36/36 endpoints com o contrato original preservado

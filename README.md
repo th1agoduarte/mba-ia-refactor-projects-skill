@@ -276,7 +276,7 @@ Depois das execuções, fiz um code review de todo o diff contra o repositório 
 ### Pré-requisitos
 
 - **Claude Code** instalado e logado (`claude --version`, `claude /login`). Para usar outro LLM, veja "Usando outros LLMs" abaixo.
-- Python 3.10+ com `uv` (ou `venv` + `pip`), Node.js 18+ e npm, `make`, `curl`.
+- Python 3.10+ com `uv` (ou `venv` + `pip`), Node.js 20.17+ e npm, `make`, `curl`.
 - `make setup` prepara os 3 projetos: venvs, dependências e `npm install`.
 
 ### Executar a skill em cada projeto
