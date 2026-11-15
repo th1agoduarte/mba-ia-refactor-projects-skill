@@ -69,11 +69,10 @@ def extract_report(text: str) -> str:
     if idx < 0:
         return text
     start = text.rfind("================================", 0, idx)
-    report = text[start if start >= 0 else idx:].strip()
-    fence = report.rfind("```")
-    if fence > report.rfind("[y/n]"):  # remove cerca de código final, se houver
-        report = report[:fence].rstrip()
-    return report + "\n"
+    lines = text[start if start >= 0 else idx:].strip().splitlines()
+    while lines and set(lines[-1].strip()) <= {"`"}:  # remove a cerca de código final (``` ou ````)
+        lines.pop()
+    return "\n".join(lines).rstrip() + "\n"
 
 
 def phase12(n: int) -> str:
