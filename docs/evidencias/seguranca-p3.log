@@ -1,0 +1,9 @@
+PASS PUT /users/1 trocar senha sem credencial: 401 (esperado 401)
+PASS PUT /users/1 desativar sem credencial: 401 (esperado 401)
+PASS usuário comum altera outro usuário (admin): 403 (esperado 403)
+PASS usuário comum se promove a admin: 403 (esperado 403)
+PASS usuário altera o próprio nome: 200 (esperado 200)
+PASS ADMIN_TOKEN altera outro usuário: 200 (esperado 200)
+PASS DELETE /users/3 sem credencial: 401 (esperado 401)
+PASS senha do admin não foi trocada (login original funciona): True (esperado True)
+resumo: 0 falha(s) []

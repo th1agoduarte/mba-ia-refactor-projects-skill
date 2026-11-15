@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 
-from middlewares.auth import authorize_admin, require_admin
+from middlewares.auth import authorize_admin, authorize_self_or_admin, require_admin
 
 
 def create_user_blueprint(controller):
@@ -21,7 +21,9 @@ def create_user_blueprint(controller):
 
     @bp.put('/users/<int:user_id>')
     def update_user(user_id):
-        # Alterar o papel do usuário exige credencial de administrador.
+        # Alterar um usuário (senha, email, active) exige o próprio usuário ou admin;
+        # alterar o papel exige credencial de administrador.
+        authorize_self_or_admin(user_id)
         return jsonify(controller.update_user(user_id, request.get_json(), authorize_admin)), 200
 
     @bp.delete('/users/<int:user_id>')

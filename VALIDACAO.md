@@ -59,7 +59,7 @@ Roteiro para conferir, do zero, cada requisito do [enunciado](DESAFIO.md). Rode 
 | # | Verificação | Esperado |
 |---|---|---|
 | 6.1 | `find <projeto> -path '*/node_modules' -prune -o -path '*/.venv' -prune -o -path '*/.claude' -prune -o -type f -print \| sort` | Pastas `config/`, `models/`, `views/` ou `routes/`, `controllers/`, `middlewares/` e um composition root |
-| 6.2 | `grep -rnE "senha_super\|minha-chave\|super-secret\|pk_live\|senha123" <projeto> --exclude-dir={.claude,node_modules,.venv}` | Nenhum segredo hardcoded no código |
+| 6.2 | `grep -rnE "senha_super\|minha-chave\|super-secret\|pk_live\|senha123" <projeto> --exclude-dir={.claude,node_modules,.venv}` | Nenhum segredo hardcoded no código (exceção aceita: senhas de demonstração do seed, como `senha123` em `code-smells-project/src/database.py`) |
 | 6.3 | `grep -rnE "execute\(.*\+\|\.query\.get\(\|utcnow\(" <projeto> --exclude-dir={.claude,node_modules,.venv}` | Sem SQL concatenado nem APIs deprecated remanescentes |
 | 6.4 | README, seção "Resultados" | Checklist de validação preenchido para os 3 projetos |
 
@@ -71,3 +71,9 @@ Roteiro para conferir, do zero, cada requisito do [enunciado](DESAFIO.md). Rode 
 | 7.2 | `ls reports/` | `audit-project-1.md`, `audit-project-2.md`, `audit-project-3.md` |
 | 7.3 | `git log --oneline` | Um commit de refatoração por projeto |
 | 7.4 | README | Seções Análise Manual, Construção da Skill, Resultados e Como Executar |
+
+## Autorização do projeto 3 (code review independente)
+
+| Comando | Esperado |
+|---|---|
+| `python3 tools/seguranca_p3.py` | `PUT /users/1` sem credencial → 401; usuário comum alterando outro usuário ou se promovendo → 403; o próprio usuário e o admin → 200; `resumo: 0 falha(s)` ([log](docs/evidencias/seguranca-p3.log)) |

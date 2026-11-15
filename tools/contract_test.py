@@ -159,7 +159,7 @@ PROJECTS = {
             ("POST", "/users", {"name": "Novo", "email": "novo@email.com", "password": "segredo1", "role": "user"}, None),
             ("POST", "/users", {"name": "Dup", "email": "novo@email.com", "password": "segredo1"}, None),
             ("POST", "/users", {"name": "Ruim", "email": "invalido", "password": "segredo1"}, None),
-            ("PUT", "/users/2", {"name": "Maria S."}, None),
+            ("PUT", "/users/2", {"name": "Maria S."}, ADMIN),  # passou a exigir o próprio usuário ou admin
             ("GET", "/users/1/tasks", None, None),
             ("POST", "/login", {"email": "joao@email.com", "password": "1234"}, None),
             ("POST", "/login", {"email": "novo@email.com", "password": "segredo1"}, None),

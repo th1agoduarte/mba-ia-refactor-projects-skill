@@ -73,7 +73,7 @@ Antes de escrever a skill, li o código dos três projetos e documentei os probl
 
 ### Decisões de design
 
-- **SKILL.md é o processo; as referências são o conhecimento.** O SKILL.md diz *o que* fazer em cada fase, *quando* ler cada referência e *qual formato* imprimir. O conhecimento de domínio (heurísticas, catálogo, playbook) fica nas referências, carregadas só na fase em que são necessárias (*progressive disclosure*). O SKILL.md tem cerca de 130 linhas.
+- **SKILL.md é o processo; as referências são o conhecimento.** O SKILL.md diz *o que* fazer em cada fase, *quando* ler cada referência e *qual formato* imprimir. O conhecimento de domínio (heurísticas, catálogo, playbook) fica nas referências, carregadas só na fase em que são necessárias (*progressive disclosure*). O SKILL.md tem cerca de 105 linhas.
 - **Regras invioláveis no topo**, porque são o que mais falha em agentes:
   1. Fases 1 e 2 somente leitura.
   2. Pausa obrigatória com a frase exata `Proceed with refactoring (Phase 3)? [y/n]`, encerrando a resposta mesmo em modo não interativo.
@@ -102,7 +102,7 @@ O catálogo traz uma regra de ajuste de severidade: sobe um nível em caminhos d
 
 ### Como garanti que a skill é agnóstica de tecnologia
 
-- **Nada nas referências cita os projetos-alvo.** Exemplos de domínio, nomes de classes e campos foram escritos de forma genérica: tirei de propósito `AppManager`, `badCrypto`, `usr/eml`. O playbook usa padrões que observei nos projetos, mas com identificadores genéricos.
+- **Referências genéricas na estrutura, mas com exemplos tirados dos projetos.** Tirei de propósito identificadores como `AppManager`, `badCrypto`, `usr/eml`. Mesmo assim, o code review independente mostrou que alguns exemplos de antes/depois do `refactoring-playbook.md` e do `report-template.md` reproduzem trechos dos três projetos: tabelas `produtos/usuarios`, o checkout e o relatório financeiro com `courses/enrollments/payments`, o `overdue` de `models/task.py`, segredos como `pk_live_…` e `minha-chave-***`. Isso não afeta os critérios: a skill roda e funciona nos três. Mas enfraquece a prova de que ela é agnóstica, porque já trazia exemplos dos alvos.
 - **Heurísticas por evidência, em tabelas multi-stack:**
   - manifesto → linguagem;
   - dependência + sinal no código → framework (Flask, Django, FastAPI, Express, Nest, Spring, Gin, Rails, Laravel);
@@ -209,7 +209,9 @@ INFO Checkout concluído: curso 2, matrícula 2
 ```
 
 Mudanças intencionais de contrato, todas de segurança e listadas pela própria skill no resumo da Fase 3:
-- `/admin/*` (projeto 1), relatório financeiro e `DELETE /api/users/:id` (projeto 2) e `DELETE /users/:id` (projeto 3) passaram a exigir `ADMIN_TOKEN`: respondem 401/403 sem ele e o status original com ele.
+- `/admin/*` (projeto 1), relatório financeiro e `DELETE /api/users/:id` (projeto 2) e `DELETE /users/:id` (projeto 3) passaram a exigir credencial de administrador: respondem 401/403 sem ela e o status original com ela. No projeto 3, a credencial é o `ADMIN_TOKEN` ou o token de login (`POST /login`) de um usuário com papel admin.
+- `PUT /users/:id` (projeto 3) passou a exigir o token do próprio usuário ou credencial de admin. Isso veio do code review independente: aberto, ele permitia trocar a senha do admin sem credencial e então usar o login dele. Prova em [docs/evidencias/seguranca-p3.log](docs/evidencias/seguranca-p3.log) (`python3 tools/seguranca_p3.py`): 401 sem credencial e 403 para outro usuário. As senhas do seed (`joao@email.com`/`1234` como admin) são dados de demonstração do projeto original e precisam ser trocadas fora de um ambiente local.
+- A mensagem de `DELETE /api/users/:id` (projeto 2) mudou de "...ficaram sujos no banco" para "...junto com suas matrículas e pagamentos", porque a exclusão deixou de deixar órfãos. O teste de contrato não pega essa mudança, porque não compara corpos em texto puro.
 - Senha, hash e segredos saíram das respostas.
 - Entradas malformadas que antes derrubavam a aplicação com 500 agora recebem 400.
 
@@ -312,7 +314,7 @@ make test            # check + citations + contrato dos 3 projetos
 make run P=2         # sobe o projeto com o comando documentado (python app.py / npm start)
 ```
 
-`tools/contract_test.py` é independente da skill. Ele sobe a aplicação com o mesmo comando do README do projeto, faz as chamadas gravadas no código original (31 no projeto 1, 7 no projeto 2, 36 no projeto 3, com casos válidos, 404 e 400) e exige o mesmo status HTTP e o **mesmo corpo**. A comparação é recursiva, inclusive dentro de listas, e ignora só campos voláteis (datas geradas na hora, tokens) e os campos sensíveis removidos de propósito. Uma lista que só mudou de ordem é informada sem reprovar. O teste também mostra os vazamentos de senha e segredo antes × depois. Uma prova negativa, com um campo aninhado e um número alterados, reprova as duas chamadas.
+`tools/contract_test.py` é independente da skill. Ele sobe a aplicação com o mesmo comando do README do projeto, faz as chamadas gravadas no código original (31 no projeto 1, 7 no projeto 2, 36 no projeto 3, com casos válidos, 404 e 400) e exige o mesmo status HTTP e, para corpos JSON (objeto ou lista), o **mesmo corpo**; corpos em texto puro não são comparados. A comparação é recursiva, inclusive dentro de listas, e ignora só campos voláteis (datas geradas na hora, tokens) e os campos sensíveis removidos de propósito. Uma lista que só mudou de ordem é informada sem reprovar. O teste também mostra os vazamentos de senha e segredo antes × depois. Uma prova negativa, com um campo aninhado e um número alterados, reprova as duas chamadas.
 
 ### Ordem sugerida
 

@@ -1,4 +1,4 @@
-# make test — 2026-11-15 16:05 UTC (após o code review)
+# make test — 2026-11-15 17:48 UTC (após o code review independente; PORT=5157 porque a 3000 estava ocupada)
 Skill
   ✓ code-smells-project/.claude/skills/refactor-arch/SKILL.md existe
   ✓ ecommerce-api-legacy/.claude/skills/refactor-arch/SKILL.md existe
@@ -125,7 +125,7 @@ reports/audit-project-3.md (task-manager-api)
   ✓ F-19: routes/task_routes.py:149, 153, 219, 234, routes/user_routes.py:83, 89 ← `print(f"Usuário criado: {user.id} - {user.name}")`
 
 58 findings: 53 com o trecho conferido na linha citada do código original, 5 sem Evidence (só arquivo e linhas conferidos), 0 com divergência
-Projeto: code-smells-project | comando: .venv/bin/python app.py
+Projeto: code-smells-project | comando: .venv/bin/python app.py | PORT=5157
 ✓ aplicação iniciou (porta aberta) | viva após os testes: True
 
 Endpoint                                                       antes depois  resultado
@@ -167,8 +167,7 @@ Security (marcadores de vazamento nas respostas):
   GET /usuarios/1: antes=['"senha"'] depois=-
 
 31/31 endpoints com o contrato original preservado
-porta 3000 ocupada por outro processo; usando 3100 (PORT)
-Projeto: ecommerce-api-legacy | comando: npm start --silent
+Projeto: ecommerce-api-legacy | comando: npm start --silent | PORT=5157
 ✓ aplicação iniciou (porta aberta) | viva após os testes: True
 
 Endpoint                                                       antes depois  resultado
@@ -183,7 +182,7 @@ DELETE /api/users/1                                              200    200  ✓
 Security (marcadores de vazamento nas respostas):
 
 7/7 endpoints com o contrato original preservado
-Projeto: task-manager-api | comando: .venv/bin/python app.py
+Projeto: task-manager-api | comando: .venv/bin/python app.py | PORT=5157
 ✓ aplicação iniciou (porta aberta) | viva após os testes: True
 
 Endpoint                                                       antes depois  resultado
@@ -208,7 +207,7 @@ GET /users/9999                                                  404    404  ✓
 POST /users                                                      201    201  ✓ 
 POST /users                                                      409    409  ✓ 
 POST /users                                                      400    400  ✓ 
-PUT /users/2                                                     200    200  ✓ 
+PUT /users/2                                                     200    200  ✓ (sem token 401, com token 200)
 GET /users/1/tasks                                               200    200  ✓ 
 POST /login                                                      200    200  ✓ 
 POST /login                                                      200    200  ✓ 
@@ -232,4 +231,3 @@ Security (marcadores de vazamento nas respostas):
   POST /login: antes=['"password"'] depois=-
 
 36/36 endpoints com o contrato original preservado
-exit=0
