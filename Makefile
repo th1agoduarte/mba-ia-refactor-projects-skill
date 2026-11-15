@@ -47,7 +47,7 @@ else
 endif
 ENSURE_GATEWAY = $(if $(NEEDS_GATEWAY),@$(MAKE) --no-print-directory gateway-up,@true)
 
-.PHONY: help setup env check-env smoke check citations test test-one contract contract-all contract-baseline sync-skill \
+.PHONY: upstream help setup env check-env smoke check citations test test-one contract contract-all contract-baseline sync-skill \
         skill skill-audit skill-refactor run gateway-up gateway-down gateway-logs gateway-test clean
 
 help: ## Lista os alvos
@@ -68,12 +68,12 @@ env: ## Cria/completa o .env a partir do .env.example + ../.env (não imprime se
 check: ## Requisitos estruturais da skill e dos 3 relatórios (sem LLM)
 	@python3 tools/check_skill.py --reports
 
-citations: ## Confere arquivo:linha + Evidence de cada finding no código ORIGINAL (upstream/main)
+citations: upstream ## Confere arquivo:linha + Evidence de cada finding no código ORIGINAL (upstream/main)
 	@python3 tools/verify_citations.py
 
 test: check citations contract-all ## Validação completa: estrutura, citações e contrato HTTP dos 3 projetos
 
-test-one: ## Uma verificação: T=skill|reports|citations|contract (contract usa P=)
+test-one: upstream ## Uma verificação: T=skill|reports|citations|contract (contract usa P=)
 	@case "$(T)" in \
 	  skill) python3 tools/check_skill.py ;; \
 	  reports) python3 tools/check_skill.py --reports ;; \
@@ -148,3 +148,7 @@ gateway-test: gateway-up ## Uma chamada /v1/messages (API da Anthropic) -> Gemin
 
 clean: ## Remove bancos e logs gerados pelos testes
 	rm -f $(PROJ_1)/loja.db $(PROJ_3)/tasks.db $(PROJ_3)/instance/tasks.db tools/.*-server.log tools/.run-*.log
+
+upstream: ## Garante o remote upstream (repositório base) usado nas comparações; cria no clone limpo
+	@git remote get-url upstream >/dev/null 2>&1 || git remote add upstream https://github.com/devfullcycle/mba-ia-refactor-projects-skill.git
+	@git fetch -q upstream
