@@ -9,7 +9,8 @@ status + corpo de cada resposta em JSON.
 Com --baseline, cada endpoint deve devolver o mesmo status do original (ou um dos
 status explicitamente aceitos para endpoints perigosos que passam a exigir auth),
 e um 2xx com corpo JSON objeto precisa manter as chaves de topo do original, exceto
-chaves sensíveis que a refatoração deve remover (ex.: secret_key). A seção
+chaves sensíveis que a refatoração deve remover (ex.: secret_key). Endpoints administrativos (ADMIN) são chamados sem e com
+X-Admin-Token (o app sobe com ADMIN_TOKEN no ambiente). A seção
 "security" mostra vazamentos (senha/hash/secret) antes x depois.
 
 Só usa a biblioteca padrão. Sai com código 1 se algum endpoint quebrar.
@@ -35,6 +36,11 @@ SENSITIVE_TOP_KEYS = {"secret_key", "db_path", "debug", "password", "senha"}
 LEAK_MARKERS = ['"senha"', '"password"', "secret_key", "minha-chave-super-secreta"]
 
 PY = ".venv/bin/python"
+
+# Endpoint administrativo: chamado 2x. Sem token pode responder 401/403 (passou a exigir
+# credencial); com X-Admin-Token válido precisa devolver o status e as chaves originais.
+ADMIN = "admin"
+ADMIN_TOKEN = "contract-test-" + os.urandom(8).hex()
 
 PROJECTS = {
     "p1": {
@@ -74,8 +80,8 @@ PROJECTS = {
             ("PUT", "/pedidos/1/status", {"status": "invalido"}, None),
             ("GET", "/relatorios/vendas", None, None),
             # Endpoints administrativos perigosos: podem passar a exigir autenticação.
-            ("POST", "/admin/query", {"sql": "SELECT COUNT(*) AS n FROM produtos"}, {200, 401, 403}),
-            ("POST", "/admin/reset-db", None, {200, 401, 403}),
+            ("POST", "/admin/query", {"sql": "SELECT COUNT(*) AS n FROM produtos"}, ADMIN),
+            ("POST", "/admin/reset-db", None, ADMIN),
         ],
     },
     "p2": {
@@ -90,8 +96,8 @@ PROJECTS = {
             ("POST", "/api/checkout", {"usr": "João", "eml": "joao@teste.com", "pwd": "123", "c_id": 1, "card": "5111222233334444"}, None),
             ("POST", "/api/checkout", {"usr": "X", "eml": "x@x.com"}, None),
             ("POST", "/api/checkout", {"usr": "X", "eml": "x@x.com", "pwd": "1", "c_id": 999, "card": "4111"}, None),
-            ("GET", "/api/admin/financial-report", None, None),
-            ("DELETE", "/api/users/1", None, None),
+            ("GET", "/api/admin/financial-report", None, ADMIN),
+            ("DELETE", "/api/users/1", None, ADMIN),
         ],
     },
     "p3": {
@@ -152,11 +158,13 @@ def wait_port(port: int, timeout: float = 40) -> bool:
     return False
 
 
-def call(base: str, method: str, path: str, body):
+def call(base: str, method: str, path: str, body, headers: dict | None = None):
     data = json.dumps(body).encode() if body is not None else None
     req = urllib.request.Request(base + path, data=data, method=method)
     if data is not None:
         req.add_header("Content-Type", "application/json")
+    for k, v in (headers or {}).items():
+        req.add_header(k, v)
     try:
         with urllib.request.urlopen(req, timeout=15) as r:
             status, raw = r.status, r.read().decode("utf-8", "replace")
@@ -170,8 +178,10 @@ def call(base: str, method: str, path: str, body):
         return status, raw
 
 
-def run(name: str) -> dict:
-    spec = PROJECTS[name]
+def run(name: str, port: int | None = None) -> dict:
+    spec = dict(PROJECTS[name])
+    if port:  # porta alternativa: só funciona se o app ler PORT do ambiente (código refatorado)
+        spec["port"] = port
     cwd = ROOT / spec["dir"]
     for f in spec["clean"]:
         (cwd / f).unlink(missing_ok=True)
@@ -179,7 +189,7 @@ def run(name: str) -> dict:
         if s.connect_ex(("127.0.0.1", spec["port"])) == 0:
             sys.exit(f"porta {spec['port']} já está em uso; pare o processo antes")
 
-    env = {**os.environ, "FLASK_DEBUG": "0", "PYTHONUNBUFFERED": "1"}
+    env = {**os.environ, "FLASK_DEBUG": "0", "PYTHONUNBUFFERED": "1", "PORT": str(spec["port"]), "ADMIN_TOKEN": ADMIN_TOKEN}
     for pre in spec["pre"]:
         subprocess.run(pre, cwd=cwd, env=env, check=True, capture_output=True)
 
@@ -190,11 +200,14 @@ def run(name: str) -> dict:
         base = f"http://127.0.0.1:{spec['port']}"
         results = []
         if booted:
-            for method, path, body, allowed in spec["requests"]:
+            for method, path, body, kind in spec["requests"]:
                 status, resp = call(base, method, path, body)
-                results.append({"method": method, "path": path, "body": body,
-                                "allowed": sorted(allowed) if allowed else None,
-                                "status": status, "response": resp})
+                entry = {"method": method, "path": path, "body": body, "admin": kind == ADMIN,
+                         "status": status, "response": resp}
+                if kind == ADMIN and status in (401, 403):  # protegido: repete com a credencial
+                    entry["status_token"], entry["response_token"] = call(
+                        base, method, path, body, {"X-Admin-Token": ADMIN_TOKEN})
+                results.append(entry)
         return {"project": spec["dir"], "command": " ".join(spec["cmd"]), "booted": booted,
                 "booted_alive": proc.poll() is None, "results": results}
     finally:
@@ -216,18 +229,23 @@ def compare(current: dict, baseline: dict) -> int:
     print(f"\n{'Endpoint':<62} {'antes':>5} {'depois':>6}  resultado")
     for before, after in zip(baseline["results"], current["results"]):
         label = f"{before['method']} {before['path']}"[:62]
-        allowed = set(before["allowed"] or [before["status"]])
-        ok = after["status"] in allowed
         note = ""
-        if ok and 200 <= after["status"] < 300 and isinstance(before["response"], dict) and isinstance(after["response"], dict):
-            missing = set(before["response"]) - set(after["response"]) - SENSITIVE_TOP_KEYS
+        status, response = after["status"], after["response"]
+        if after.get("admin") and "status_token" in after:
+            # sem token: 401/403 aceito; com token: tem que ser o comportamento original
+            note = f"(sem token {after['status']}, com token {after['status_token']})"
+            status, response = after["status_token"], after["response_token"]
+        ok = status == before["status"]
+        if ok and 200 <= status < 300 and isinstance(before["response"], dict) and isinstance(response, dict):
+            missing = set(before["response"]) - set(response) - SENSITIVE_TOP_KEYS
             if missing:
                 ok, note = False, f"chaves ausentes: {sorted(missing)}"
         failures += not ok
-        print(f"{label:<62} {before['status']:>5} {after['status']:>6}  {'✓' if ok else '✗'} {note}")
+        print(f"{label:<62} {before['status']:>5} {status:>6}  {'✓' if ok else '✗'} {note}")
     print("\nSecurity (marcadores de vazamento nas respostas):")
     for before, after in zip(baseline["results"], current["results"]):
-        lb, la = leaks(before["response"]), leaks(after["response"])
+        lb = leaks(before["response"])
+        la = leaks(after["response"]) + leaks(after.get("response_token", ""))
         if lb or la:
             print(f"  {before['method']} {before['path']}: antes={lb or '-'} depois={la or '-'}")
     return failures
@@ -238,14 +256,15 @@ def main() -> int:
     ap.add_argument("project", choices=sorted(PROJECTS))
     ap.add_argument("--out", required=True)
     ap.add_argument("--baseline")
+    ap.add_argument("--port", type=int, help="porta alternativa (repassada ao app como PORT)")
     args = ap.parse_args()
 
-    current = run(args.project)
+    current = run(args.project, args.port)
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(current, indent=2, ensure_ascii=False, default=str), encoding="utf-8")
 
-    print(f"Projeto: {current['project']} | comando: {current['command']}")
+    print(f"Projeto: {current['project']} | comando: {current['command']}" + (f" | PORT={args.port}" if args.port else ""))
     print(f"{'✓' if current['booted'] else '✗'} aplicação iniciou (porta aberta) | viva após os testes: {current['booted_alive']}")
     if not current["booted"]:
         print((ROOT / "tools" / f".{args.project}-server.log").read_text()[-3000:])

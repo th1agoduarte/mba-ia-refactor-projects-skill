@@ -8,7 +8,7 @@
       "method": "GET",
       "path": "/",
       "body": null,
-      "allowed": null,
+      "admin": false,
       "status": 200,
       "response": {
         "endpoints": {
@@ -27,7 +27,7 @@
       "method": "GET",
       "path": "/health",
       "body": null,
-      "allowed": null,
+      "admin": false,
       "status": 200,
       "response": {
         "ambiente": "producao",
@@ -45,14 +45,14 @@
       "method": "GET",
       "path": "/produtos",
       "body": null,
-      "allowed": null,
+      "admin": false,
       "status": 200,
       "response": {
         "dados": [
           {
             "ativo": 1,
             "categoria": "informatica",
-            "criado_em": "2026-11-15 15:38:17",
+            "criado_em": "2026-11-15 15:49:26",
             "descricao": "Notebook potente para jogos",
             "estoque": 10,
             "id": 1,
@@ -62,7 +62,7 @@
           {
             "ativo": 1,
             "categoria": "informatica",
-            "criado_em": "2026-11-15 15:38:17",
+            "criado_em": "2026-11-15 15:49:26",
             "descricao": "Mouse sem fio ergonômico",
             "estoque": 50,
             "id": 2,
@@ -72,7 +72,7 @@
           {
             "ativo": 1,
             "categoria": "informatica",
-            "criado_em": "2026-11-15 15:38:17",
+            "criado_em": "2026-11-15 15:49:26",
             "descricao": "Teclado mecânico RGB",
             "estoque": 30,
             "id": 3,
@@ -82,7 +82,7 @@
           {
             "ativo": 1,
             "categoria": "informatica",
-            "criado_em": "2026-11-15 15:38:17",
+            "criado_em": "2026-11-15 15:49:26",
             "descricao": "Monitor 27 polegadas 144hz",
             "estoque": 15,
             "id": 4,
@@ -92,7 +92,7 @@
           {
             "ativo": 1,
             "categoria": "informatica",
-            "criado_em": "2026-11-15 15:38:17",
+            "criado_em": "2026-11-15 15:49:26",
             "descricao": "Headset com microfone",
             "estoque": 25,
             "id": 5,
@@ -102,7 +102,7 @@
           {
             "ativo": 1,
             "categoria": "moveis",
-            "criado_em": "2026-11-15 15:38:17",
+            "criado_em": "2026-11-15 15:49:26",
             "descricao": "Cadeira ergonômica",
             "estoque": 8,
             "id": 6,
@@ -112,7 +112,7 @@
           {
             "ativo": 1,
             "categoria": "informatica",
-            "criado_em": "2026-11-15 15:38:17",
+            "criado_em": "2026-11-15 15:49:26",
             "descricao": "Webcam 1080p",
             "estoque": 20,
             "id": 7,
@@ -122,7 +122,7 @@
           {
             "ativo": 1,
             "categoria": "informatica",
-            "criado_em": "2026-11-15 15:38:17",
+            "criado_em": "2026-11-15 15:49:26",
             "descricao": "Hub USB 3.0 7 portas",
             "estoque": 40,
             "id": 8,
@@ -132,7 +132,7 @@
           {
             "ativo": 1,
             "categoria": "informatica",
-            "criado_em": "2026-11-15 15:38:17",
+            "criado_em": "2026-11-15 15:49:26",
             "descricao": "SSD NVMe 1TB",
             "estoque": 35,
             "id": 9,
@@ -142,7 +142,7 @@
           {
             "ativo": 1,
             "categoria": "vestuario",
-            "criado_em": "2026-11-15 15:38:17",
+            "criado_em": "2026-11-15 15:49:26",
             "descricao": "Camiseta estampa código",
             "estoque": 100,
             "id": 10,
@@ -157,14 +157,14 @@
       "method": "GET",
       "path": "/produtos/busca?q=Mouse",
       "body": null,
-      "allowed": null,
+      "admin": false,
       "status": 200,
       "response": {
         "dados": [
           {
             "ativo": 1,
             "categoria": "informatica",
-            "criado_em": "2026-11-15 15:38:17",
+            "criado_em": "2026-11-15 15:49:26",
             "descricao": "Mouse sem fio ergonômico",
             "estoque": 50,
             "id": 2,
@@ -180,14 +180,14 @@
       "method": "GET",
       "path": "/produtos/busca?categoria=informatica&preco_min=100&preco_max=500",
       "body": null,
-      "allowed": null,
+      "admin": false,
       "status": 200,
       "response": {
         "dados": [
           {
             "ativo": 1,
             "categoria": "informatica",
-            "criado_em": "2026-11-15 15:38:17",
+            "criado_em": "2026-11-15 15:49:26",
             "descricao": "Teclado mecânico RGB",
             "estoque": 30,
             "id": 3,
@@ -197,7 +197,7 @@
           {
             "ativo": 1,
             "categoria": "informatica",
-            "criado_em": "2026-11-15 15:38:17",
+            "criado_em": "2026-11-15 15:49:26",
             "descricao": "Headset com microfone",
             "estoque": 25,
             "id": 5,
@@ -207,7 +207,7 @@
           {
             "ativo": 1,
             "categoria": "informatica",
-            "criado_em": "2026-11-15 15:38:17",
+            "criado_em": "2026-11-15 15:49:26",
             "descricao": "Webcam 1080p",
             "estoque": 20,
             "id": 7,
@@ -217,7 +217,7 @@
           {
             "ativo": 1,
             "categoria": "informatica",
-            "criado_em": "2026-11-15 15:38:17",
+            "criado_em": "2026-11-15 15:49:26",
             "descricao": "SSD NVMe 1TB",
             "estoque": 35,
             "id": 9,
@@ -233,13 +233,13 @@
       "method": "GET",
       "path": "/produtos/1",
       "body": null,
-      "allowed": null,
+      "admin": false,
       "status": 200,
       "response": {
         "dados": {
           "ativo": 1,
           "categoria": "informatica",
-          "criado_em": "2026-11-15 15:38:17",
+          "criado_em": "2026-11-15 15:49:26",
           "descricao": "Notebook potente para jogos",
           "estoque": 10,
           "id": 1,
@@ -253,7 +253,7 @@
       "method": "GET",
       "path": "/produtos/9999",
       "body": null,
-      "allowed": null,
+      "admin": false,
       "status": 404,
       "response": {
         "erro": "Produto não encontrado",
@@ -270,7 +270,7 @@
         "estoque": 3,
         "categoria": "livros"
       },
-      "allowed": null,
+      "admin": false,
       "status": 201,
       "response": {
         "dados": {
@@ -284,7 +284,7 @@
       "method": "POST",
       "path": "/produtos",
       "body": {},
-      "allowed": null,
+      "admin": false,
       "status": 400,
       "response": {
         "erro": "Dados inválidos"
@@ -298,7 +298,7 @@
         "preco": -1,
         "estoque": 1
       },
-      "allowed": null,
+      "admin": false,
       "status": 400,
       "response": {
         "erro": "Preço não pode ser negativo"
@@ -314,7 +314,7 @@
         "estoque": 9,
         "categoria": "informatica"
       },
-      "allowed": null,
+      "admin": false,
       "status": 200,
       "response": {
         "mensagem": "Produto atualizado",
@@ -325,7 +325,7 @@
       "method": "DELETE",
       "path": "/produtos/11",
       "body": null,
-      "allowed": null,
+      "admin": false,
       "status": 200,
       "response": {
         "mensagem": "Produto deletado",
@@ -336,7 +336,7 @@
       "method": "DELETE",
       "path": "/produtos/9999",
       "body": null,
-      "allowed": null,
+      "admin": false,
       "status": 404,
       "response": {
         "erro": "Produto não encontrado"
@@ -346,26 +346,26 @@
       "method": "GET",
       "path": "/usuarios",
       "body": null,
-      "allowed": null,
+      "admin": false,
       "status": 200,
       "response": {
         "dados": [
           {
-            "criado_em": "2026-11-15 15:38:17",
+            "criado_em": "2026-11-15 15:49:26",
             "email": "admin@loja.com",
             "id": 1,
             "nome": "Admin",
             "tipo": "admin"
           },
           {
-            "criado_em": "2026-11-15 15:38:17",
+            "criado_em": "2026-11-15 15:49:26",
             "email": "joao@email.com",
             "id": 2,
             "nome": "João Silva",
             "tipo": "cliente"
           },
           {
-            "criado_em": "2026-11-15 15:38:17",
+            "criado_em": "2026-11-15 15:49:26",
             "email": "maria@email.com",
             "id": 3,
             "nome": "Maria Santos",
@@ -379,11 +379,11 @@
       "method": "GET",
       "path": "/usuarios/1",
       "body": null,
-      "allowed": null,
+      "admin": false,
       "status": 200,
       "response": {
         "dados": {
-          "criado_em": "2026-11-15 15:38:17",
+          "criado_em": "2026-11-15 15:49:26",
           "email": "admin@loja.com",
           "id": 1,
           "nome": "Admin",
@@ -396,7 +396,7 @@
       "method": "GET",
       "path": "/usuarios/9999",
       "body": null,
-      "allowed": null,
+      "admin": false,
       "status": 404,
       "response": {
         "erro": "Usuário não encontrado"
@@ -410,7 +410,7 @@
         "email": "teste@email.com",
         "senha": "segredo1"
       },
-      "allowed": null,
+      "admin": false,
       "status": 201,
       "response": {
         "dados": {
@@ -425,7 +425,7 @@
       "body": {
         "nome": "Sem email"
       },
-      "allowed": null,
+      "admin": false,
       "status": 400,
       "response": {
         "erro": "Nome, email e senha são obrigatórios"
@@ -438,7 +438,7 @@
         "email": "joao@email.com",
         "senha": "123456"
       },
-      "allowed": null,
+      "admin": false,
       "status": 200,
       "response": {
         "dados": {
@@ -458,7 +458,7 @@
         "email": "teste@email.com",
         "senha": "segredo1"
       },
-      "allowed": null,
+      "admin": false,
       "status": 200,
       "response": {
         "dados": {
@@ -478,7 +478,7 @@
         "email": "joao@email.com",
         "senha": "errada"
       },
-      "allowed": null,
+      "admin": false,
       "status": 401,
       "response": {
         "erro": "Email ou senha inválidos",
@@ -501,7 +501,7 @@
           }
         ]
       },
-      "allowed": null,
+      "admin": false,
       "status": 201,
       "response": {
         "dados": {
@@ -524,7 +524,7 @@
           }
         ]
       },
-      "allowed": null,
+      "admin": false,
       "status": 400,
       "response": {
         "erro": "Estoque insuficiente para Mouse Wireless",
@@ -538,7 +538,7 @@
         "usuario_id": 2,
         "itens": []
       },
-      "allowed": null,
+      "admin": false,
       "status": 400,
       "response": {
         "erro": "Pedido deve ter pelo menos 1 item"
@@ -548,12 +548,12 @@
       "method": "GET",
       "path": "/pedidos",
       "body": null,
-      "allowed": null,
+      "admin": false,
       "status": 200,
       "response": {
         "dados": [
           {
-            "criado_em": "2026-11-15 15:38:18",
+            "criado_em": "2026-11-15 15:49:27",
             "id": 1,
             "itens": [
               {
@@ -581,12 +581,12 @@
       "method": "GET",
       "path": "/pedidos/usuario/2",
       "body": null,
-      "allowed": null,
+      "admin": false,
       "status": 200,
       "response": {
         "dados": [
           {
-            "criado_em": "2026-11-15 15:38:18",
+            "criado_em": "2026-11-15 15:49:27",
             "id": 1,
             "itens": [
               {
@@ -616,7 +616,7 @@
       "body": {
         "status": "aprovado"
       },
-      "allowed": null,
+      "admin": false,
       "status": 200,
       "response": {
         "mensagem": "Status atualizado",
@@ -629,7 +629,7 @@
       "body": {
         "status": "invalido"
       },
-      "allowed": null,
+      "admin": false,
       "status": 400,
       "response": {
         "erro": "Status inválido"
@@ -639,7 +639,7 @@
       "method": "GET",
       "path": "/relatorios/vendas",
       "body": null,
-      "allowed": null,
+      "admin": false,
       "status": 200,
       "response": {
         "dados": {
@@ -661,28 +661,34 @@
       "body": {
         "sql": "SELECT COUNT(*) AS n FROM produtos"
       },
-      "allowed": [
-        200,
-        401,
-        403
-      ],
-      "status": 403,
+      "admin": true,
+      "status": 401,
       "response": {
-        "erro": "Endpoint administrativo desabilitado (defina ADMIN_TOKEN)"
+        "erro": "Credencial de administrador inválida"
+      },
+      "status_token": 200,
+      "response_token": {
+        "dados": [
+          {
+            "n": 10
+          }
+        ],
+        "sucesso": true
       }
     },
     {
       "method": "POST",
       "path": "/admin/reset-db",
       "body": null,
-      "allowed": [
-        200,
-        401,
-        403
-      ],
-      "status": 403,
+      "admin": true,
+      "status": 401,
       "response": {
-        "erro": "Endpoint administrativo desabilitado (defina ADMIN_TOKEN)"
+        "erro": "Credencial de administrador inválida"
+      },
+      "status_token": 200,
+      "response_token": {
+        "mensagem": "Banco de dados resetado",
+        "sucesso": true
       }
     }
   ]
