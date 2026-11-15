@@ -1,8 +1,8 @@
-2026-11-15T17:48:50.536Z WARN PAYMENT_GATEWAY_KEY não definida: usando gateway de pagamento simulado
-2026-11-15T17:48:50.607Z INFO LMS API rodando na porta 5157
-2026-11-15T17:48:50.924Z INFO Cobrança simulada: cartão final 4444, valor 497, status PAID
-2026-11-15T17:48:50.979Z INFO Checkout concluído: curso 2, matrícula 2
-2026-11-15T17:48:50.985Z INFO Cobrança simulada: cartão final 4444, valor 497, status PAID
-2026-11-15T17:48:50.986Z INFO Checkout concluído: curso 2, matrícula 3
-2026-11-15T17:48:50.988Z INFO Cobrança simulada: cartão final 4444, valor 997, status DENIED
-2026-11-15T17:48:50.999Z INFO Usuário 1 removido com matrículas e pagamentos
+2026-11-15T19:52:11.749Z WARN PAYMENT_GATEWAY_KEY não definida: usando gateway de pagamento simulado
+2026-11-15T19:52:11.807Z INFO LMS API rodando na porta 5157
+2026-11-15T19:52:12.054Z INFO Cobrança simulada: cartão final 4444, valor 497, status PAID
+2026-11-15T19:52:12.109Z INFO Checkout concluído: curso 2, matrícula 2
+2026-11-15T19:52:12.114Z INFO Cobrança simulada: cartão final 4444, valor 497, status PAID
+2026-11-15T19:52:12.115Z INFO Checkout concluído: curso 2, matrícula 3
+2026-11-15T19:52:12.116Z INFO Cobrança simulada: cartão final 4444, valor 997, status DENIED
+2026-11-15T19:52:12.131Z INFO Usuário 1 removido com matrículas e pagamentos
