@@ -2,7 +2,10 @@ const { PAYMENT_STATUS } = require('../config/constants');
 
 // Dados iniciais (os mesmos do sistema legado). A senha do usuário do seed é gravada com hash.
 async function seedDatabase(db, models) {
-    if (await models.users.count() > 0) return;
+    // Só popula um banco completamente vazio (com DB_PATH persistente, apagar todos os usuários
+    // não pode fazer o seed duplicar cursos no próximo boot).
+    const { total } = await db.get('SELECT (SELECT COUNT(*) FROM users) + (SELECT COUNT(*) FROM courses) AS total');
+    if (total > 0) return;
 
     await db.transaction(async () => {
         const userId = await models.users.create({ name: 'Leonan', email: 'leonan@fullcycle.com.br', password: '123' });

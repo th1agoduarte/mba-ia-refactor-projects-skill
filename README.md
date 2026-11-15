@@ -118,7 +118,7 @@ O catálogo traz uma regra de ajuste de severidade: sobe um nível em caminhos d
 | Desafio | Solução |
 |---|---|
 | **Provar a pausa da Fase 2.** Num terminal interativo a pausa é visível, mas era preciso evidência reproduzível de que nada é modificado antes do "y". | A skill é executada em **duas etapas headless** (`tools/run_skill.py`). Primeiro `claude -p "/refactor-arch"` **só com ferramentas de leitura liberadas** (`Read`, `Grep`, `Glob` e `grep/find/wc/cat`; `Edit`/`Write` negados). A execução termina na pergunta `[y/n]`, e o script confere com `git status` que nenhum arquivo do projeto mudou. Depois de revisar o relatório, `claude -p --resume <sessão> "y"` retoma a **mesma sessão** e executa a Fase 3. |
-| **Linhas exatas.** Agentes tendem a "estimar" linhas. | Regra inviolável no SKILL.md (só linha lida com `grep -n`/`cat -n`), template com `File:` + `Evidence:` obrigatórios e um verificador independente (`tools/verify_citations.py`) que procura o trecho citado no código **original** em volta da linha informada: **58/58 citações conferidas**. |
+| **Linhas exatas.** Agentes tendem a "estimar" linhas. | Regra inviolável no SKILL.md (só linha lida com `grep -n`/`cat -n`), template com `File:` + `Evidence:` obrigatórios e um verificador independente (`tools/verify_citations.py`) que procura o trecho citado no código **original** em volta da linha informada: nos 58 findings, todos os arquivos e linhas existem, 53 trechos foram encontrados na linha citada e 0 divergiram. Os outros 5 findings vieram sem `Evidence`, então só arquivo e linhas puderam ser conferidos. |
 | **Refatorar sem quebrar, mas corrigindo falhas de segurança.** Endpoints como `/admin/query` (SQL arbitrário) não podem continuar abertos, e apagá-los quebraria o contrato. | Regra 5 da skill: o contrato é preservado e só duas exceções são aceitas (remover dados sensíveis e exigir credencial em endpoints perigosos), sempre listadas no resumo. O teste de contrato chama esses endpoints **duas vezes**: sem credencial aceita 401/403; com `ADMIN_TOKEN` exige o status e o corpo originais. |
 | **Skill acoplada aos projetos.** Os primeiros rascunhos das referências usavam nomes vistos nos projetos (`AppManager`, `badCrypto`, campos `usr/eml`). | Troquei por exemplos genéricos antes da primeira execução. As referências descrevem padrões; a detecção acontece no código. |
 | **Projeto já organizado (projeto 3).** Uma skill que "sempre cria `src/`" destruiria o que está certo. | Tabela de adaptação em `mvc-guidelines.md`. No projeto 3 a skill manteve `models/` e `routes/`, criou só `controllers/`, `config/` e `middlewares/`, tirou as rotas de categoria de `report_routes.py` e apagou `utils/`, que era código morto. |
@@ -222,7 +222,7 @@ Mudanças intencionais de contrato, todas de segurança e listadas pela própria
 | Domínio descrito corretamente | ✓ e-commerce | ✓ LMS com checkout | ✓ Task Manager | idem |
 | Nº de arquivos condiz com a realidade | ✓ 4 | ✓ 3 | ✓ 15 | `find` no commit original |
 | **Fase 2** — Relatório segue o template | ✓ | ✓ | ✓ | `make check` |
-| Cada finding tem arquivo e linhas exatos | ✓ | ✓ | ✓ | `make citations` (58/58) |
+| Cada finding tem arquivo e linhas exatos | ✓ | ✓ | ✓ | `make citations` (58 com arquivo e linhas válidos; 53 com trecho conferido, 5 sem `Evidence`) |
 | Ordenados CRITICAL → LOW | ✓ | ✓ | ✓ | `make check` |
 | Mínimo de 5 findings | ✓ 21 | ✓ 18 | ✓ 19 | `make check` |
 | APIs deprecated (se aplicável) | ✓ verificado, nenhuma | ✓ verificado, nenhuma | ✓ 2 APIs | seção "Deprecated APIs" |
@@ -249,6 +249,23 @@ Mudanças intencionais de contrato, todas de segurança e listadas pela própria
   - O `CLAUDE.md` do workspace (fora do repositório) foi carregado como contexto nas execuções; um resumo da Fase 3 cita "workspace rules". Ele não contém nada sobre os projetos nem sobre os findings.
   - Os resumos da Fase 3 saíram em inglês em dois projetos (P2 e P3); os relatórios saíram em português.
   - As senhas de demonstração do seed continuam no código dos seeds, gravadas com hash forte, para que os usuários de exemplo sigam logando. A skill justificou isso como resto aceito.
+
+### Code review do código refatorado
+
+Depois das execuções, fiz um code review de todo o diff contra o repositório original (`/code-review` do Claude Code: 153 arquivos, refatoração dos 3 projetos e ferramentas). Os 10 achados foram conferidos no código, todos procediam e todos foram corrigidos. Cada correção foi testada e `make test` foi rodado de novo no fim:
+
+| # | Achado | Correção | Como foi testado |
+|---|---|---|---|
+| 1 | `make skill*` ecoava `$(RUN_ENV)`, que contém chaves, no terminal | Receitas com `@` e eco só do nome do provider | Nenhuma receita expõe `$(RUN_ENV)`; `make smoke` ok |
+| 2 | P2: cartão cobrado antes da transação, sem estorno se a gravação falhasse | `paymentGateway.refund()` chamado quando a transação falha depois da cobrança | Gravação forçada a falhar: `charge + refund` |
+| 3 | P3: hashes MD5 de bancos legados não logavam mais | MD5 legado aceito uma vez no login e regravado com scrypt | Senha errada 401; MD5 legado 200; hash regravado; novo login 200 |
+| 4 | Teste de contrato comparava só status e chaves de topo | Comparação recursiva do corpo inteiro, inclusive em listas | 31/31 · 7/7 · 36/36 de novo; prova negativa reprova |
+| 5 | Verificador de citações aprovava `Evidence` vazia ou ausente | Trecho com menos de 8 caracteres falha; sem `Evidence` é contado à parte | 53 conferidas + 5 sem Evidence + 0 divergências |
+| 6 | P1/P3: bind `127.0.0.1` e CORS desligado por padrão, fora das exceções de contrato da skill | Padrões do legado restaurados (`0.0.0.0`, CORS `*`), configuráveis por `HOST`/`CORS_ORIGINS`; o debug segue desligado | Contrato |
+| 7 | P2: cartão inválido validado antes do curso (404 virava 400) | Formato do cartão checado depois do curso, como no legado | Curso 999 + cartão inválido = 404 |
+| 8 | P2: seed duplicava cursos com `DB_PATH` persistente sem usuários | Seed só roda com o banco completamente vazio | 2 boots seguidos = 2 cursos |
+| 9 | `run_skill.py`: checagem "nada modificado" não falhava e `make skill` respondia `y` sozinho | Falha com código de saída, compara com o estado anterior à execução e pergunta no terminal | Sem `--answer` fora do terminal, recusa |
+| 10 | Faltavam `check-env`, `smoke` e `test-one T=` (padrão do workspace) | Alvos criados | `make check-env`, `make smoke`, `make test-one T=skill` |
 
 ---
 
@@ -285,14 +302,17 @@ make sync-skill P=2       # copia a skill do projeto 1 para o projeto 2 (idem P=
 ### Como validar que a refatoração funcionou
 
 ```bash
+make check-env       # ferramentas e chaves do PROVIDER, sem imprimir segredos
+make smoke           # uma chamada curta ao Claude Code
 make check           # estrutura da skill + 3 relatórios (sem LLM)
+make test-one T=citations   # uma verificação isolada: skill | reports | citations | contract
 make citations       # cada arquivo:linha + Evidence dos relatórios conferido no código original
 make contract P=1    # sobe o projeto e compara TODOS os endpoints com o contrato original
 make test            # check + citations + contrato dos 3 projetos
 make run P=2         # sobe o projeto com o comando documentado (python app.py / npm start)
 ```
 
-`tools/contract_test.py` é independente da skill. Ele sobe a aplicação com o mesmo comando do README do projeto, faz as chamadas gravadas no código original (31 no projeto 1, 7 no projeto 2, 36 no projeto 3, com casos válidos, 404 e 400) e exige o mesmo status HTTP e as mesmas chaves JSON de topo. Ele também mostra os vazamentos de senha e segredo antes × depois.
+`tools/contract_test.py` é independente da skill. Ele sobe a aplicação com o mesmo comando do README do projeto, faz as chamadas gravadas no código original (31 no projeto 1, 7 no projeto 2, 36 no projeto 3, com casos válidos, 404 e 400) e exige o mesmo status HTTP e o **mesmo corpo**. A comparação é recursiva, inclusive dentro de listas, e ignora só campos voláteis (datas geradas na hora, tokens) e os campos sensíveis removidos de propósito. Uma lista que só mudou de ordem é informada sem reprovar. O teste também mostra os vazamentos de senha e segredo antes × depois. Uma prova negativa, com um campo aninhado e um número alterados, reprova as duas chamadas.
 
 ### Ordem sugerida
 

@@ -32,6 +32,37 @@ ROOT = Path(__file__).resolve().parent.parent
 
 # Chaves de topo que podem (e devem) sumir depois da refatoração.
 SENSITIVE_TOP_KEYS = {"secret_key", "db_path", "debug", "password", "senha"}
+# Valores que mudam a cada execução (gerados na hora ou relativos ao relógio do seed).
+VOLATILE_KEYS = {"created_at", "updated_at", "generated_at", "timestamp", "criado_em", "token", "due_date"}
+
+
+def diff_body(before, after, path="$") -> list[str]:
+    """Diferenças entre os corpos: toda chave do original (exceto sensíveis) precisa existir com o
+    mesmo valor, em qualquer profundidade; chaves novas são permitidas. Listas comparam item a item
+    e, se só a ordem mudou, isso é informado mas não reprova."""
+    if isinstance(before, dict) and isinstance(after, dict):
+        out = []
+        for k, v in before.items():
+            if k in SENSITIVE_TOP_KEYS:
+                continue
+            if k not in after:
+                out.append(f"{path}.{k} ausente")
+            elif k not in VOLATILE_KEYS:
+                out += diff_body(v, after[k], f"{path}.{k}")
+        return out
+    if isinstance(before, list) and isinstance(after, list):
+        if len(before) != len(after):
+            return [f"{path}: {len(before)} itens antes, {len(after)} depois"]
+        out = [d for i, (b, a) in enumerate(zip(before, after)) for d in diff_body(b, a, f"{path}[{i}]")]
+        if out:
+            key = lambda x: json.dumps(x, sort_keys=True, default=str)
+            rest = [d for b, a in zip(sorted(before, key=key), sorted(after, key=key)) for d in diff_body(b, a, path)]
+            if not rest:
+                return [f"~{path}: mesma lista em outra ordem"]
+        return out
+    if isinstance(before, (int, float)) and isinstance(after, (int, float)) and not isinstance(before, bool):
+        return [] if abs(before - after) < 1e-6 else [f"{path}: {before!r} → {after!r}"]
+    return [] if before == after else [f"{path}: {str(before)[:60]!r} → {str(after)[:60]!r}"]
 # Marcadores de vazamento procurados no corpo das respostas.
 LEAK_MARKERS = ['"senha"', '"password"', "secret_key", "minha-chave-super-secreta"]
 
@@ -243,10 +274,13 @@ def compare(current: dict, baseline: dict) -> int:
             note = f"(sem token {after['status']}, com token {after['status_token']})"
             status, response = after["status_token"], after["response_token"]
         ok = status == before["status"]
-        if ok and 200 <= status < 300 and isinstance(before["response"], dict) and isinstance(response, dict):
-            missing = set(before["response"]) - set(response) - SENSITIVE_TOP_KEYS
-            if missing:
-                ok, note = False, f"chaves ausentes: {sorted(missing)}"
+        if ok and isinstance(before["response"], (dict, list)):
+            diffs = diff_body(before["response"], response)
+            hard = [d for d in diffs if not d.startswith("~")]
+            if hard:
+                ok, note = False, "corpo: " + "; ".join(hard[:3]) + (f" (+{len(hard) - 3})" if len(hard) > 3 else "")
+            elif diffs:
+                note = (note + " " if note else "") + diffs[0][1:]
         failures += not ok
         print(f"{label:<62} {before['status']:>5} {status:>6}  {'✓' if ok else '✗'} {note}")
     print("\nSecurity (marcadores de vazamento nas respostas):")

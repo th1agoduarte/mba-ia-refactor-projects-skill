@@ -13,15 +13,16 @@ Roteiro para conferir, do zero, cada requisito do [enunciado](DESAFIO.md). Rode 
 
 | # | Comando | Esperado |
 |---|---|---|
-| 1.1 | `make test-one` | Todos `✓`: SKILL.md nos 3 projetos e cópias idênticas, frontmatter `name: refactor-arch`, as 3 fases, Fases 1–2 somente leitura, pergunta `[y/n]`, 5 áreas de conhecimento, ≥ 8 anti-patterns com as 4 severidades, detecção de APIs deprecated, ≥ 8 transformações com código antes/depois |
+| 1.1 | `make test-one T=skill` | Todos `✓`: SKILL.md nos 3 projetos e cópias idênticas, frontmatter `name: refactor-arch`, as 3 fases, Fases 1–2 somente leitura, pergunta `[y/n]`, 5 áreas de conhecimento, ≥ 8 anti-patterns com as 4 severidades, detecção de APIs deprecated, ≥ 8 transformações com código antes/depois |
 | 1.2 | `ls */.claude/skills/refactor-arch/references/` | Os 5 arquivos `.md` em cada projeto |
-| 1.3 | Prova negativa: `sed -i 's/\[y\/n\]/[s]/' code-smells-project/.claude/skills/refactor-arch/SKILL.md && make test-one; git checkout code-smells-project/.claude` | Falha em "Fase 2 termina pedindo confirmação" e em "cópia ... idêntica" (o verificador detecta de fato) |
+| 1.3 | Prova negativa: `sed -i 's/\[y\/n\]/[s]/' code-smells-project/.claude/skills/refactor-arch/SKILL.md && make test-one T=skill; git checkout code-smells-project/.claude` | Falha em "Fase 2 termina pedindo confirmação" e em "cópia ... idêntica" (o verificador detecta de fato) |
 
 ## 2. Relatórios de auditoria (Requisito 3 + critérios de aceite da Fase 2)
 
 | # | Comando | Esperado |
 |---|---|---|
 | 2.1 | `make check` | Para `reports/audit-project-{1,2,3}.md`: segue o template, ≥ 5 findings, ≥ 1 CRITICAL/HIGH, todo finding com `arquivo:linha`, ordem CRITICAL → LOW, Summary igual à lista, seção "Deprecated APIs" e pergunta final `[y/n]` |
+| 2.1b | `make citations` | Todos os arquivos e linhas citados existem no código original; 53 trechos de `Evidence` encontrados na linha citada, 5 findings sem `Evidence`, 0 divergências |
 | 2.2 | Escolha 3 findings de cada relatório e abra o arquivo na linha citada **no código original** (`git show upstream/main:<projeto>/<arquivo> \| sed -n '<linha>p'`) | O trecho citado está lá |
 | 2.3 | README, seção "Análise Manual" × relatórios | ≥ 5 problemas da análise manual aparecem no relatório do projeto 1 (tabela de cruzamento no README) |
 
@@ -47,7 +48,7 @@ Roteiro para conferir, do zero, cada requisito do [enunciado](DESAFIO.md). Rode 
 
 | # | Comando | Esperado |
 |---|---|---|
-| 5.1 | `make contract P=1` | `✓ aplicação iniciou` e todos os endpoints com o status original. Exceções aceitas: `/admin/*` pode responder 401/403 (passou a exigir token) |
+| 5.1 | `make contract P=1` | `✓ aplicação iniciou` e todas as chamadas com o status e o corpo originais (comparação recursiva, ignorando datas e tokens). Endpoints admin: 401/403 sem token e o comportamento original com `ADMIN_TOKEN` |
 | 5.2 | `make contract P=2` | Idem para os 7 cenários do LMS |
 | 5.3 | `make contract P=3` | Idem para as 36 chamadas do Task Manager (com `seed.py` antes) |
 | 5.4 | Seção "Security" da saída | Vazamentos de `senha`/`password`/`secret_key` presentes **antes** e ausentes **depois** |

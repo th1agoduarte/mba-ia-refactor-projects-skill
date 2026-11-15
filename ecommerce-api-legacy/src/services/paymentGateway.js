@@ -17,6 +17,11 @@ class SimulatedPaymentGateway {
         this.logger.info(`Cobrança simulada: cartão final ${cardNumber.slice(-VISIBLE_CARD_DIGITS)}, valor ${amount}, status ${status}`);
         return status;
     }
+
+    // Estorno de uma cobrança aprovada (usado quando a gravação do checkout falha depois da cobrança).
+    async refund({ cardNumber, amount }) {
+        this.logger.warn(`Estorno simulado: cartão final ${cardNumber.slice(-VISIBLE_CARD_DIGITS)}, valor ${amount}`);
+    }
 }
 
 module.exports = { SimulatedPaymentGateway };

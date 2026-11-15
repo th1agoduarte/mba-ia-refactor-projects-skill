@@ -8,7 +8,8 @@ em DUAS etapas, para provar a pausa obrigatória da Fase 2:
   etapa 2  claude -p --resume <sessão> "y"   com edição e Bash liberados
            → Fase 3 (refatoração + validação).
 
-Uso: python tools/run_skill.py N [--phase 12|3|all] [--answer y]
+Uso: python tools/run_skill.py N [--phase 12|3|all] [--answer y|n]
+(--phase all pergunta no terminal depois da auditoria; nunca responde "y" sozinho)
 Saídas: docs/evidencias/skill-runs/pN-fase1-2.md, pN-fase3.md, pN-session.json
 
 Variáveis opcionais: CLAUDE_MODEL (ex.: claude-sonnet-5-5) e as do provider
@@ -75,8 +76,18 @@ def extract_report(text: str) -> str:
     return "\n".join(lines).rstrip() + "\n"
 
 
+def project_state(n: int) -> dict[str, str]:
+    """Arquivos do projeto (fora de .claude/) com o hash do conteúdo, inclusive os não rastreados."""
+    out = subprocess.run(["git", "ls-files", "-co", "--exclude-standard", "--", PROJECTS[n]],
+                         cwd=ROOT, capture_output=True, text=True).stdout.split()
+    files = [f for f in out if "/.claude/" not in f]
+    return {f: subprocess.run(["git", "hash-object", f], cwd=ROOT, capture_output=True, text=True).stdout.strip()
+            if (ROOT / f).exists() else "<apagado>" for f in files}
+
+
 def phase12(n: int) -> str:
     cwd = ROOT / PROJECTS[n]
+    before = project_state(n)
     data = claude(["/refactor-arch", "--permission-mode", "default",
                    "--allowedTools", *READ_ONLY_TOOLS, "--disallowedTools", *DENY_WRITE], cwd)
     text = data.get("result", "")
@@ -89,11 +100,15 @@ def phase12(n: int) -> str:
     report.parent.mkdir(exist_ok=True)
     report.write_text(extract_report(text), encoding="utf-8")
     (OUT / f"p{n}-session.json").write_text(json.dumps({"session_id": data.get("session_id")}), encoding="utf-8")
-    git = subprocess.run(["git", "status", "--porcelain", "--", PROJECTS[n]], cwd=ROOT, capture_output=True, text=True).stdout
-    changed = [l for l in git.splitlines() if "/.claude/" not in l]
+    after = project_state(n)
+    changed = sorted(f for f in before.keys() | after.keys() if before.get(f) != after.get(f))
     print(text[-1500:])
     print(f"\n✓ relatório salvo em {report.relative_to(ROOT)}")
-    print("✓ nenhum arquivo do projeto modificado nas Fases 1-2" if not changed else f"✗ arquivos modificados: {changed}")
+    if changed:
+        sys.exit(f"✗ a skill modificou arquivos antes da confirmação: {changed}")
+    print("✓ nenhum arquivo do projeto modificado nas Fases 1-2")
+    if "[y/n]" not in text:
+        sys.exit("✗ a saída não terminou com a pergunta de confirmação [y/n]")
     return data.get("session_id")
 
 
@@ -114,12 +129,22 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("project", type=int, choices=sorted(PROJECTS))
     ap.add_argument("--phase", choices=["12", "3", "all"], default="all")
-    ap.add_argument("--answer", default="y")
+    ap.add_argument("--answer", help="resposta à pergunta da Fase 2 (obrigatória em --phase 3 fora de um terminal)")
     args = ap.parse_args()
     if args.phase in ("12", "all"):
         phase12(args.project)
     if args.phase in ("3", "all"):
-        phase3(args.project, args.answer)
+        answer = args.answer
+        if answer is None:
+            # A pausa é do humano: revisar o relatório antes de responder. Nunca responde sozinho.
+            if not sys.stdin.isatty():
+                sys.exit("✗ informe --answer y|n (ou rode num terminal para responder após revisar o relatório)")
+            answer = input(f"\nRevise reports/audit-project-{args.project}.md. "
+                           "Proceed with refactoring (Phase 3)? [y/n] ").strip() or "n"
+        if answer.lower() not in ("y", "yes", "s", "sim"):
+            print("Fase 3 não executada (resposta negativa).")
+            return 0
+        phase3(args.project, answer)
     return 0
 
 

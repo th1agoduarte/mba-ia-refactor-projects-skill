@@ -115,6 +115,9 @@ class UserController:
             raise UnauthorizedError('Credenciais inválidas')
         if not user.active:
             raise ForbiddenError('Usuário inativo')
+        if user.password_upgraded:  # hash MD5 legado migrado no login
+            db.session.commit()
+            log.info('Hash de senha legado migrado para o usuário %s', user.id)
 
         return {
             'message': 'Login realizado com sucesso',

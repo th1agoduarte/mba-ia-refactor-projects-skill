@@ -11,7 +11,9 @@ The deliverable is a Claude Code skill (`.claude/skills/refactor-arch/`: `SKILL.
 ```bash
 make setup                 # venvs (uv) for the 2 Flask projects + npm install (rebuilds sqlite3 if npm 11 blocked its script)
 make test                  # check + citations + contract-all (no LLM)
+make check-env / smoke     # agent tools + provider keys (no secrets) / one short Claude Code call
 make check                 # tools/check_skill.py --reports: skill structure + 3 reports
+make test-one T=skill|reports|citations|contract
 make citations             # tools/verify_citations.py: every File:line + Evidence checked against upstream/main
 make contract P=1|2|3      # tools/contract_test.py: boots the app with its documented command, replays the legacy contract
 make run P=N               # run one app in the foreground
@@ -26,7 +28,7 @@ make skill-refactor P=N    # resumes that session answering "y" -> phase 3      
 
 - **Skill source of truth is `code-smells-project/.claude/skills/refactor-arch/`.** Edit it there, then `make sync-skill P=2` and `P=3`; `check_skill.py` fails if the copies differ. Keep references free of project-specific names (agnosticism is a graded requirement). `check_skill.py` parses `## Fase N — <nome>`, `### AP-xx —`, the catalog index table, `## T-xx` sections with ANTES/DEPOIS code blocks, and report headings `### F-xx [SEV] ...` / `File: path:line`. Changing those formats means updating the checker.
 - **Two-step headless run (`tools/run_skill.py`)** proves the mandatory phase-2 pause: step 1 allows only read tools and checks `git status`; step 2 is `claude -p --resume <session> "y"`. Session ids are stored in `docs/evidencias/skill-runs/pN-session.json`. Raw outputs: `pN-fase1-2.md`, `pN-fase3.md`.
-- **Contract test is independent of the skill.** Baselines `docs/evidencias/contract/pN-antes.json` were recorded on the legacy code and must not be re-recorded on refactored code (`make contract-baseline` refuses). Endpoints marked `ADMIN` are called without a credential (401/403 accepted) and again with `X-Admin-Token` + `Authorization: Bearer` (the app is started with `ADMIN_TOKEN`), and must return the original status. If the default port is busy, the test uses port +100 via `PORT` (works only on refactored code). A local NestJS container often holds 3000.
+- **Contract test is independent of the skill.** Baselines `docs/evidencias/contract/pN-antes.json` were recorded on the legacy code and must not be re-recorded on refactored code (`make contract-baseline` refuses). Endpoints marked `ADMIN` are called without a credential (401/403 accepted) and again with `X-Admin-Token` + `Authorization: Bearer` (the app is started with `ADMIN_TOKEN`), and must return the original status. Bodies are compared recursively (lists included), ignoring only volatile keys (dates, tokens) and removed sensitive keys. If the default port is busy, the test uses port +100 via `PORT` (works only on refactored code). A local NestJS container often holds 3000.
 - To re-run the skill on legacy code without touching the deliverable: `git worktree add ../refactor-legado upstream/main` and copy `.claude/` into each project there.
 
 ## Constraints
@@ -37,4 +39,4 @@ make skill-refactor P=N    # resumes that session answering "y" -> phase 3      
 
 ## Status (2026-11-15)
 
-Done: manual analysis (`docs/analise-manual.md`), skill, 3 runs (21/18/19 findings), refactor committed per project, contract 31/31 · 7/7 · 36/36, citations 58/58, README A–D. One run per project, no iterations needed. Costs: ~US$ 1 (phases 1–2) + ~US$ 3–4 (phase 3) per project on Claude Code.
+Done: manual analysis (`docs/analise-manual.md`), skill, 3 runs (21/18/19 findings), refactor committed per project, contract 31/31 · 7/7 · 36/36, citations: 53 snippets verified + 5 findings without Evidence, README A–D. Code review of the whole diff: 10 findings, all fixed (see README). One run per project, no iterations needed. Costs: ~US$ 1 (phases 1–2) + ~US$ 3–4 (phase 3) per project on Claude Code.

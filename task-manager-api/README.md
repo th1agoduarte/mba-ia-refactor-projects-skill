@@ -14,7 +14,7 @@ A aplicação sobe em `http://localhost:5000`. O `seed.py` popula o banco SQLite
 
 ## Configuração
 
-Tudo vem de variáveis de ambiente (ou de um `.env` na raiz do projeto). Veja `.env.example`. Sem nenhuma variável, a aplicação sobe com padrões seguros: debug desligado, bind em `127.0.0.1`, CORS desligado, `SECRET_KEY` aleatória (com aviso no log) e SMTP desabilitado.
+Tudo vem de variáveis de ambiente (ou de um `.env` na raiz do projeto). Veja `.env.example`. Sem nenhuma variável, a aplicação sobe com debug desligado, bind em `0.0.0.0` e CORS liberado (os mesmos do sistema legado; restrinja com `HOST` e `CORS_ORIGINS`), `SECRET_KEY` aleatória (com aviso no log) e SMTP desabilitado.
 
 ## Operações administrativas
 

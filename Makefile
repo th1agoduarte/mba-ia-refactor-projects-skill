@@ -47,7 +47,7 @@ else
 endif
 ENSURE_GATEWAY = $(if $(NEEDS_GATEWAY),@$(MAKE) --no-print-directory gateway-up,@true)
 
-.PHONY: help setup env check citations test test-one contract contract-all contract-baseline sync-skill \
+.PHONY: help setup env check-env smoke check citations test test-one contract contract-all contract-baseline sync-skill \
         skill skill-audit skill-refactor run gateway-up gateway-down gateway-logs gateway-test clean
 
 help: ## Lista os alvos
@@ -73,8 +73,27 @@ citations: ## Confere arquivo:linha + Evidence de cada finding no código ORIGIN
 
 test: check citations contract-all ## Validação completa: estrutura, citações e contrato HTTP dos 3 projetos
 
-test-one: ## Só a estrutura da skill (relatórios opcionais)
-	@python3 tools/check_skill.py
+test-one: ## Uma verificação: T=skill|reports|citations|contract (contract usa P=)
+	@case "$(T)" in \
+	  skill) python3 tools/check_skill.py ;; \
+	  reports) python3 tools/check_skill.py --reports ;; \
+	  citations) python3 tools/verify_citations.py ;; \
+	  contract) $(MAKE) --no-print-directory contract P=$(P) ;; \
+	  *) echo "use T=skill|reports|citations|contract"; exit 1 ;; esac
+
+check-env: ## Ferramentas e configuração do agente, sem imprimir segredos
+	@command -v claude >/dev/null && echo "✓ $$(claude --version)" || echo "✗ claude não encontrado (instale o Claude Code)"
+	@for c in node npm uv python3 docker; do command -v $$c >/dev/null && echo "✓ $$c" || echo "✗ $$c"; done
+	@echo "PROVIDER: $(or $(PROVIDER),login do Claude Code)"
+	@case "$(PROVIDER)" in \
+	  anthropic) v=ANTHROPIC_API_KEY ;; aws) v="AWS_ACCESS_KEY_ID AWS_LLM_MODEL" ;; \
+	  google|gateway) v="GOOGLE_API_KEY LITELLM_MASTER_KEY" ;; openai) v="OPENAI_API_KEY OPENAI_LLM_MODEL LITELLM_MASTER_KEY" ;; *) v= ;; esac; \
+	  for k in $$v; do n=$$(grep -E "^$$k=" .env 2>/dev/null | cut -d= -f2- | tr -d '\n' | wc -c); \
+	    [ "$$n" -gt 0 ] && echo "✓ $$k ($$n caracteres)" || echo "✗ $$k vazio no .env"; done
+
+smoke: ## Uma chamada curta ao Claude Code com o PROVIDER escolhido (custo mínimo)
+	$(ENSURE_GATEWAY)
+	@$(RUN_ENV) claude -p "Responda apenas: ok" --max-turns 1 $$( [ -n "$$CLAUDE_MODEL" ] && echo --model "$$CLAUDE_MODEL") | sed 's/^/✓ resposta: /'
 
 contract: ## Sobe o projeto P e compara todos os endpoints com o contrato original
 	@python3 tools/contract_test.py p$(P) --out $(EVID)/contract/p$(P)-depois.json --baseline $(EVID)/contract/p$(P)-antes.json $(if $(PORT),--port $(PORT)) --server-log $(EVID)/apps-rodando/p$(P)-server.log
@@ -93,15 +112,18 @@ sync-skill: ## Copia a skill do projeto 1 para o projeto P (2 ou 3)
 
 skill: ## Executa /refactor-arch no projeto P: Fases 1-2, pausa, depois Fase 3 com "y"
 	$(ENSURE_GATEWAY)
-	$(RUN_ENV) python3 tools/run_skill.py $(P) --phase all
+	@echo "→ /refactor-arch no projeto $(P) | LLM: $(or $(PROVIDER),login do Claude Code)"
+	@$(RUN_ENV) python3 tools/run_skill.py $(P) --phase all
 
 skill-audit: ## Só as Fases 1-2 (somente leitura); salva reports/audit-project-P.md
 	$(ENSURE_GATEWAY)
-	$(RUN_ENV) python3 tools/run_skill.py $(P) --phase 12
+	@echo "→ Fases 1-2 no projeto $(P) | LLM: $(or $(PROVIDER),login do Claude Code)"
+	@$(RUN_ENV) python3 tools/run_skill.py $(P) --phase 12
 
 skill-refactor: ## Responde "y" à sessão da auditoria e executa a Fase 3 (ANSWER=n para recusar)
 	$(ENSURE_GATEWAY)
-	$(RUN_ENV) python3 tools/run_skill.py $(P) --phase 3 --answer $(or $(ANSWER),y)
+	@echo "→ Fase 3 no projeto $(P) (resposta: $(or $(ANSWER),y)) | LLM: $(or $(PROVIDER),login do Claude Code)"
+	@$(RUN_ENV) python3 tools/run_skill.py $(P) --phase 3 --answer $(or $(ANSWER),y)
 
 run: ## Sobe o projeto P em primeiro plano, com o comando documentado
 	@case $(P) in \

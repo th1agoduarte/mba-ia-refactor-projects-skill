@@ -14,8 +14,8 @@ def _env_bool(name, default=False):
     return os.environ.get(name, "1" if default else "0").strip().lower() in ("1", "true", "yes", "on")
 
 
-def _env_list(name):
-    return [item.strip() for item in os.environ.get(name, "").split(",") if item.strip()]
+def _env_list(name, default=""):
+    return [item.strip() for item in os.environ.get(name, default).split(",") if item.strip()]
 
 
 class Settings:
@@ -23,11 +23,11 @@ class Settings:
 
     SECRET_KEY = os.environ.get("SECRET_KEY") or None  # resolvido em resolve_secret_key()
     DEBUG = _env_bool("FLASK_DEBUG")
-    HOST = os.environ.get("HOST", "127.0.0.1")
+    HOST = os.environ.get("HOST", "0.0.0.0")  # mesmo bind do legado; debug segue desligado
     PORT = int(os.environ.get("PORT", "5000"))
     DATABASE_PATH = os.environ.get("DATABASE_PATH", "loja.db")
     ADMIN_TOKEN = os.environ.get("ADMIN_TOKEN", "")  # vazio = endpoints /admin desabilitados (403)
-    CORS_ORIGINS = _env_list("CORS_ORIGINS")  # vazio = CORS desligado (só mesma origem)
+    CORS_ORIGINS = _env_list("CORS_ORIGINS", "*")  # padrão do legado: todas as origens; restrinja por env
     LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO").upper()
     APP_ENV = os.environ.get("APP_ENV", "producao")
     APP_VERSION = "1.0.0"

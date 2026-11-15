@@ -3,7 +3,8 @@ Confere se as citações dos relatórios batem com o código ORIGINAL (upstream/
 para cada finding, TODOS os arquivos citados em `File:` precisam existir no commit original,
 as linhas citadas precisam caber em cada arquivo e o trecho de `Evidence:` precisa aparecer
 em um deles, dentro de ±3 linhas de alguma linha citada (trechos mascarados com *** são
-comparados só até a máscara).
+comparados só até a máscara). Trecho com menos de 8 caracteres falha; finding sem
+Evidence é contado à parte, não como conferido.
 
 Uso: python tools/verify_citations.py [--ref upstream/main]
 """
@@ -35,7 +36,7 @@ def norm(s: str) -> str:
 
 def main() -> int:
     ref = sys.argv[sys.argv.index("--ref") + 1] if "--ref" in sys.argv else "upstream/main"
-    total = ok = 0
+    total = ok = no_evidence = 0
     for n, proj in PROJECTS.items():
         text = (ROOT / "reports" / f"audit-project-{n}.md").read_text(encoding="utf-8")
         print(f"\nreports/audit-project-{n}.md ({proj})")
@@ -70,21 +71,30 @@ def main() -> int:
                 continue
             label = ", ".join(f"{p}:{s.strip()}" for p, s in cites)[:70]
             if not m_ev:
-                ok += 1
-                print(f"  ~ {fid}: {label} ok (sem Evidence para conferir)")
+                no_evidence += 1
+                print(f"  ~ {fid}: {label} existe, mas sem Evidence (trecho não conferível)")
                 continue
             raw = m_ev.group(1).replace("\\`", "`")
-            snippet = norm(re.split(r"\*\*\*|\.\.\.|…|`", raw)[0])[:60]
-            hit = False
+            # Evidence pode ter vários trechos (`a` / `b`); cada um com >= 8 caracteres é testado.
+            parts = [norm(x)[:60] for x in re.split(r"\*\*\*|\.\.\.|…|`", raw)]
+            parts = [x for x in parts if len(x) >= 8 and x not in ("/", "//")]
+            if not parts:  # trecho vazio ou curto demais casaria com qualquer linha
+                print(f"  ✗ {fid}: Evidence curta demais para conferir (`{raw[:40]}`)")
+                continue
+            snippet, hit = parts[0], False
             for path, src, lines in windows:
                 win = sorted({i for l in lines for i in range(max(1, l - 3), min(len(src), l + 3) + 1)})
-                if any(snippet in norm(src[i - 1]) for i in win) or snippet in norm(" ".join(src[i - 1] for i in win)):
-                    hit = True
+                text = norm(" ".join(src[i - 1] for i in win))
+                found = next((x for x in parts if x in text), None)
+                if found:
+                    snippet, hit = found, True
                     break
             ok += hit
             print(f"  {'✓' if hit else '✗'} {fid}: {label} ← `{snippet[:50]}`")
-    print(f"\n{ok}/{total} citações conferidas no código original")
-    return 0 if ok == total else 1
+    failed = total - ok - no_evidence
+    print(f"\n{total} findings: {ok} com o trecho conferido na linha citada do código original, "
+          f"{no_evidence} sem Evidence (só arquivo e linhas conferidos), {failed} com divergência")
+    return 0 if failed == 0 else 1
 
 
 if __name__ == "__main__":

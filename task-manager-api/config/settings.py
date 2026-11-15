@@ -13,8 +13,8 @@ def _env_int(name, default):
     return int(os.environ.get(name, default))
 
 
-def _env_list(name):
-    return [item.strip() for item in os.environ.get(name, '').split(',') if item.strip()]
+def _env_list(name, default=''):
+    return [item.strip() for item in os.environ.get(name, default).split(',') if item.strip()]
 
 
 class Settings:
@@ -29,9 +29,9 @@ class Settings:
     TOKEN_MAX_AGE = _env_int('TOKEN_MAX_AGE', '28800')
 
     DEBUG = os.environ.get('FLASK_DEBUG', '0') == '1'
-    HOST = os.environ.get('HOST', '127.0.0.1')
+    HOST = os.environ.get('HOST', '0.0.0.0')  # mesmo bind do legado; debug segue desligado
     PORT = _env_int('PORT', '5000')
-    CORS_ORIGINS = _env_list('CORS_ORIGINS')
+    CORS_ORIGINS = _env_list('CORS_ORIGINS', '*')  # padrão do legado: todas as origens; restrinja por env
     LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO').upper()
 
     SMTP_HOST = os.environ.get('SMTP_HOST', '')

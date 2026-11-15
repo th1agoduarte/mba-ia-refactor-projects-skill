@@ -1,8 +1,16 @@
+import hashlib
+import hmac
+import re
+
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from config.settings import DEFAULT_ROLE, ROLE_ADMIN
 from database import db, utcnow
 from models.task import Task
+
+
+# Formato do hash gravado pela versão legada (hashlib.md5(...).hexdigest()).
+_LEGACY_MD5 = re.compile(r'[0-9a-f]{32}')
 
 
 class User(db.Model):
@@ -15,6 +23,7 @@ class User(db.Model):
     role = db.Column(db.String(50), default=DEFAULT_ROLE)
     active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=utcnow)
+    password_upgraded = False  # atributo de instância, não é coluna
 
     # Remover o usuário remove as tasks dele na mesma transação.
     tasks = db.relationship('Task', back_populates='user', cascade='save-update, merge, delete')
@@ -34,6 +43,15 @@ class User(db.Model):
         self.password = generate_password_hash(raw_password)
 
     def check_password(self, raw_password):
+        """Confere a senha. Hash MD5 legado (32 hex, sem salt) é aceito uma vez e regravado
+        com o hash forte; quem chama deve fazer commit se `password_upgraded` ficar True."""
+        if _LEGACY_MD5.fullmatch(self.password or ''):
+            legacy = hashlib.md5(raw_password.encode()).hexdigest()
+            if not hmac.compare_digest(legacy, self.password):
+                return False
+            self.set_password(raw_password)
+            self.password_upgraded = True
+            return True
         return check_password_hash(self.password, raw_password)
 
     def is_admin(self):

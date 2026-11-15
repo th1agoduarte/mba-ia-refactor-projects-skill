@@ -19,9 +19,9 @@ Todas as variáveis são opcionais e estão documentadas em [`.env.example`](.en
 |---|---|---|
 | `SECRET_KEY` | aleatória por boot | chave de assinatura do Flask |
 | `ADMIN_TOKEN` | vazio | habilita `POST /admin/reset-db` e `POST /admin/query` (header `X-Admin-Token`); vazio = 403 |
-| `HOST` / `PORT` | `127.0.0.1` / `5000` | bind do servidor |
+| `HOST` / `PORT` | `0.0.0.0` / `5000` | bind do servidor (mesmo padrão do legado) |
 | `FLASK_DEBUG` | `0` | modo debug |
-| `CORS_ORIGINS` | vazio | origens liberadas para CORS |
+| `CORS_ORIGINS` | `*` | origens liberadas para CORS, separadas por vírgula (padrão do legado: todas) |
 
 Exemplo de endpoint administrativo:
 
