@@ -47,7 +47,7 @@ else
 endif
 ENSURE_GATEWAY = $(if $(NEEDS_GATEWAY),@$(MAKE) --no-print-directory gateway-up,@true)
 
-.PHONY: help setup env check test test-one contract contract-all contract-baseline sync-skill \
+.PHONY: help setup env check citations test test-one contract contract-all contract-baseline sync-skill \
         skill skill-audit skill-refactor run gateway-up gateway-down gateway-logs gateway-test clean
 
 help: ## Lista os alvos
@@ -68,13 +68,16 @@ env: ## Cria/completa o .env a partir do .env.example + ../.env (não imprime se
 check: ## Requisitos estruturais da skill e dos 3 relatórios (sem LLM)
 	@python3 tools/check_skill.py --reports
 
-test: check contract-all ## Validação completa: estrutura + contrato HTTP dos 3 projetos
+citations: ## Confere arquivo:linha + Evidence de cada finding no código ORIGINAL (upstream/main)
+	@python3 tools/verify_citations.py
+
+test: check citations contract-all ## Validação completa: estrutura, citações e contrato HTTP dos 3 projetos
 
 test-one: ## Só a estrutura da skill (relatórios opcionais)
 	@python3 tools/check_skill.py
 
 contract: ## Sobe o projeto P e compara todos os endpoints com o contrato original
-	@python3 tools/contract_test.py p$(P) --out $(EVID)/contract/p$(P)-depois.json --baseline $(EVID)/contract/p$(P)-antes.json $(if $(PORT),--port $(PORT))
+	@python3 tools/contract_test.py p$(P) --out $(EVID)/contract/p$(P)-depois.json --baseline $(EVID)/contract/p$(P)-antes.json $(if $(PORT),--port $(PORT)) --server-log $(EVID)/apps-rodando/p$(P)-server.log
 
 contract-all: ## Contrato HTTP dos 3 projetos
 	@set -e; for p in 1 2 3; do $(MAKE) --no-print-directory contract P=$$p; done

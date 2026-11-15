@@ -1,0 +1,66 @@
+
+reports/audit-project-1.md (code-smells-project)
+  ✓ F-01: app.py:7, controllers.py:289 ← `app.config["SECRET_KEY"] = "minha-chave-`
+  ✓ F-02: app.py:47-57, 59-78 ← `@app.route("/admin/query", methods=["POST"])`
+  ✓ F-03: controllers.py:285-289, models.py:83, 99 ← `"db_path": "loja.db", "debug": True, "secret_key":`
+  ✓ F-04: database.py:75-83, models.py:109-111, 126-129 ← `"SELECT * FROM usuarios WHERE email = '" + email +`
+  ~ F-05: models.py:1-314, controllers.py:1-292, app.py:6-78 ok (sem Evidence para conferir)
+  ✓ F-06: models.py:28, 47-50, 57-61, 68, 92, 109-111, 126-129, 140, 148-151, 15 ← `query += " AND (nome LIKE '%" + termo + "%' OR des`
+  ~ F-07: models.py:133-169, 65-70, database.py:36-53 ok (sem Evidence para conferir)
+  ✓ F-08: app.py:4, 6, 49, 66, 82, controllers.py:3, 266, models.py:1, 5, 25, 44 ← `from database import get_db`
+  ✓ F-09: app.py:8-9, 88 ← `app.run(host="0.0.0.0", port=5000, debug=True)`
+  ✓ F-10: controllers.py:26-54, 66-90, 188-216, 237-250, 264-274 ← `categorias_validas = ["informatica", "moveis", "ve`
+  ✓ F-11: database.py:4-10 ← `global db_connection`
+  ✓ F-12: app.py:56, 83-86, controllers.py:8, 11, 57, 61, 106, 161, 179, 182, 20 ← `print("Login falhou: " + email)`
+  ✓ F-13: app.py:61-62, controllers.py:28-50, 72-90, 119-121, 169-171, 195-201,  ← `dados = request.get_json()`
+  ✓ F-14: app.py:77-78, controllers.py:10-12, 21-22, 60-62, 95-96, 108-109, 125- ← `except Exception as e: return jsonify({"erro": str`
+  ✓ F-15: controllers.py:208-210, 247-250 ← `print("ENVIANDO EMAIL: Pedido " + str(resultado["p`
+  ~ F-16: models.py:12-21, 31-40, 304-313, 79-86, 95-102, 171-201, 203-233 ok (sem Evidence para conferir)
+  ✓ F-17: models.py:186-199, 218-231, 239-254 ← `cursor3.execute("SELECT nome FROM produtos WHERE i`
+  ✓ F-18: models.py:257-262, 150, 247-253, controllers.py:49, 52, 242, app.py:88 ← `if faturamento > 10000: desconto = faturamento * 0`
+  ✓ F-19: controllers.py:14, 56, 64, 98, 136, 160, models.py:24, 54, 65, 89, 187 ← `def buscar_produto(id):`
+  ✓ F-20: controllers.py:17-20, 139-142, 177-183, 200 ← `if not itens or len(itens) == 0:`
+  ✓ F-21: database.py:2, models.py:2, 63, 70, 283 ← `import os`
+
+reports/audit-project-2.md (ecommerce-api-legacy)
+  ✓ F-01: src/AppManager.js:1-141 ← `class AppManager {`
+  ✓ F-02: src/AppManager.js:12-16, 46-48, 50-60, 69-71, 133-135 ← `this.db.run("INSERT INTO enrollments`
+  ✓ F-03: src/AppManager.js:18, 68-69, src/utils.js:17-23 ← `hash += Buffer.from(pwd).toString('base64').substr`
+  ✓ F-04: src/AppManager.js:45 ← `console.log(`
+  ✓ F-05: src/AppManager.js:80-129, 131-136 ← `app.get('/api/admin/financial-report', (req, res) `
+  ✓ F-06: src/utils.js:2-5 ← `dbPass: "senha_super_`
+  ✓ F-07: src/app.js:5-10, src/AppManager.js:2, 7 ← `this.db = new sqlite3.Database(':memory:');`
+  ✓ F-08: src/AppManager.js:28-78, 80-129 ← `let status = cc.startsWith("4") ? "PAID" : "DENIED`
+  ✓ F-09: src/AppManager.js:29-35, 46, 68, 132 ← `if (!u || !e || !cid || !cc) return res.status(400`
+  ✓ F-10: src/utils.js:9-10, 12-15, 25, src/AppManager.js:2, 59 ← `let globalCache = {};`
+  ✓ F-11: src/AppManager.js:26, 37-77, 86-121 ← `const self = this;`
+  ✓ F-12: src/AppManager.js:38, 41, 51, 55, 57, 70, 84, 92-93, 104-106, 133-135, ← `if (err || !course) return res.status(404).send("C`
+  ✓ F-13: src/AppManager.js:45-48, 59 ← `let status = cc.startsWith("4") ? "PAID" : "DENIED`
+  ✓ F-14: src/AppManager.js:83, 89-92, 102-106 ← `courses.forEach(c => {`
+  ✓ F-15: src/app.js:13, src/utils.js:13 ← `console.log(`
+  ✓ F-16: src/AppManager.js:2, 104, src/utils.js:2-3, 5, 9-10, 25 ← `const { config, logAndCache, badCrypto, totalReven`
+  ✓ F-17: src/AppManager.js:4, 29-33, 89, src/utils.js:17 ← `let u = req.body.usr; let e = req.body.eml; let p `
+  ✓ F-18: src/AppManager.js:37, 46, 48, 68, 108, src/utils.js:6, 19 ← `cc.startsWith("4") ? "PAID" : "DENIED"`
+
+reports/audit-project-3.md (task-manager-api)
+  ✓ F-01: app.py:13, services/notification_service.py:7-10 ← `app.config['SECRET_KEY'] = 'super-secret-`
+  ✓ F-02: models/user.py:21, routes/user_routes.py:33, 85, 129, 209 ← `'password': self.password,`
+  ✓ F-03: models/user.py:29, 32 ← `self.password = hashlib.md5(pwd.encode()).hexdiges`
+  ✓ F-04: routes/user_routes.py:52, 71-72, 119-122, 134-151, 210 ← `role = data.get('role', 'user')`
+  ✓ F-05: app.py:9-31, seed.py:2 ← `app = Flask(__name__)`
+  ✓ F-06: app.py:15, 34 ← `app.run(debug=True, host='0.0.0.0', port=5000)`
+  ✓ F-07: routes/report_routes.py:12-101, 103-155 ← `for t in all_tasks: if t.due_date: if t.due_date <`
+  ✓ F-08: routes/task_routes.py:85-154, 156-223, 273-299 ← `if status not in ['pending', 'in_progress', 'done'`
+  ✓ F-09: routes/user_routes.py:42-90, 92-132, 185-211 ← `existing = User.query.filter_by(email=email).first`
+  ✓ F-10: models/category.py:11, models/task.py:15-16, 52, models/user.py:14, ro ← `user = User.query.get(user_id)`
+  ✓ F-11: models/task.py:50-60, routes/report_routes.py:34-36, 67, 132-135, 151, ← `if t.status != 'done' and t.status != 'cancelled':`
+  ~ F-12: routes/report_routes.py:19-28, 53-56, 159-163, routes/task_routes.py:4 ok (sem Evidence para conferir)
+  ✓ F-13: routes/report_routes.py:180, 196-202, routes/task_routes.py:96-100, 11 ← `if priority < 1 or priority > 5:`
+  ✓ F-14: routes/report_routes.py:186, 207, 221, routes/task_routes.py:62-63, 13 ← `except:`
+  ✓ F-15: app.py:7, models/task.py:3, 38-48, models/user.py:34-38, routes/report ← `import os, sys, json, datetime`
+  ✓ F-16: app.py:34, routes/report_routes.py:19-28, 45, 129, 180, routes/task_ro ← `if len(title) < 3:`
+  ~ F-17: models/category.py:14, models/task.py:45, routes/report_routes.py:10,  ok (sem Evidence para conferir)
+  ✓ F-18: models/task.py:38-60, models/user.py:34-38, routes/task_routes.py:30-3 ← `if self.role == 'admin': return True else: return `
+  ✓ F-19: routes/task_routes.py:149, 153, 219, 234, routes/user_routes.py:83, 89 ← `print(f"Usuário criado: {user.id} - {user.name}")`
+
+58/58 citações conferidas no código original

@@ -1,0 +1,8 @@
+2026-11-15T15:51:41.942Z WARN PAYMENT_GATEWAY_KEY não definida: usando gateway de pagamento simulado
+2026-11-15T15:51:42.003Z INFO LMS API rodando na porta 3100
+2026-11-15T15:51:42.296Z INFO Cobrança simulada: cartão final 4444, valor 497, status PAID
+2026-11-15T15:51:42.350Z INFO Checkout concluído: curso 2, matrícula 2
+2026-11-15T15:51:42.356Z INFO Cobrança simulada: cartão final 4444, valor 497, status PAID
+2026-11-15T15:51:42.357Z INFO Checkout concluído: curso 2, matrícula 3
+2026-11-15T15:51:42.359Z INFO Cobrança simulada: cartão final 4444, valor 997, status DENIED
+2026-11-15T15:51:42.372Z INFO Usuário 1 removido com matrículas e pagamentos

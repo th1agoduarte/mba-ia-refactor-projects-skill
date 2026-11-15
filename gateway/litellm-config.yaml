@@ -1,0 +1,35 @@
+# Gateway LiteLLM: expõe Gemini, OpenAI, Anthropic e Bedrock atrás da API da
+# Anthropic (/v1/messages), que é a que o Claude Code usa. Assim a mesma skill
+# roda no Claude Code com outro LLM: ANTHROPIC_BASE_URL=http://localhost:4000.
+#
+# O modelo é escolhido pelo prefixo no nome, por exemplo:
+#   anthropic/claude-haiku-5-5
+#   bedrock/<model-id do Bedrock>
+#   gemini/gemini-3.5-flash
+model_list:
+  - model_name: "anthropic/*"
+    litellm_params:
+      model: "anthropic/*"
+      api_key: os.environ/ANTHROPIC_API_KEY
+
+  - model_name: "bedrock/*"
+    litellm_params:
+      model: "bedrock/*"
+      aws_region_name: os.environ/AWS_REGION
+
+  - model_name: "gemini/*"
+    litellm_params:
+      model: "gemini/*"
+      api_key: os.environ/GOOGLE_API_KEY
+
+  - model_name: "openai/*"
+    litellm_params:
+      model: "openai/*"
+      api_key: os.environ/OPENAI_API_KEY
+
+litellm_settings:
+  # Descarta parâmetros que o provider de destino não aceita, em vez de devolver erro 400.
+  drop_params: true
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY

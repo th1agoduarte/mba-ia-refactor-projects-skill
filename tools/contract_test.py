@@ -178,7 +178,7 @@ def call(base: str, method: str, path: str, body, headers: dict | None = None):
         return status, raw
 
 
-def run(name: str, port: int | None = None) -> dict:
+def run(name: str, port: int | None = None, save_log: str | None = None) -> dict:
     spec = dict(PROJECTS[name])
     if port:  # porta alternativa: só funciona se o app ler PORT do ambiente (código refatorado)
         spec["port"] = port
@@ -186,8 +186,12 @@ def run(name: str, port: int | None = None) -> dict:
     for f in spec["clean"]:
         (cwd / f).unlink(missing_ok=True)
     with socket.socket() as s:
-        if s.connect_ex(("127.0.0.1", spec["port"])) == 0:
-            sys.exit(f"porta {spec['port']} já está em uso; pare o processo antes")
+        busy = s.connect_ex(("127.0.0.1", spec["port"])) == 0
+    if busy and not port:  # outro serviço local na porta padrão: tenta +100 (o app lê PORT)
+        print(f"porta {spec['port']} ocupada por outro processo; usando {spec['port'] + 100} (PORT)")
+        spec["port"] += 100
+    elif busy:
+        sys.exit(f"porta {spec['port']} já está em uso; pare o processo antes")
 
     env = {**os.environ, "FLASK_DEBUG": "0", "PYTHONUNBUFFERED": "1", "PORT": str(spec["port"]), "ADMIN_TOKEN": ADMIN_TOKEN}
     for pre in spec["pre"]:
@@ -217,6 +221,9 @@ def run(name: str, port: int | None = None) -> dict:
         except subprocess.TimeoutExpired:
             os.killpg(proc.pid, signal.SIGKILL)
         log.close()
+        if save_log:
+            Path(save_log).parent.mkdir(parents=True, exist_ok=True)
+            Path(save_log).write_text((ROOT / "tools" / f".{name}-server.log").read_text(), encoding="utf-8")
 
 
 def leaks(resp) -> list[str]:
@@ -256,10 +263,11 @@ def main() -> int:
     ap.add_argument("project", choices=sorted(PROJECTS))
     ap.add_argument("--out", required=True)
     ap.add_argument("--baseline")
+    ap.add_argument("--server-log", help="copia o log do servidor (boot + requisições) para este arquivo")
     ap.add_argument("--port", type=int, help="porta alternativa (repassada ao app como PORT)")
     args = ap.parse_args()
 
-    current = run(args.project, args.port)
+    current = run(args.project, args.port, args.server_log)
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(current, indent=2, ensure_ascii=False, default=str), encoding="utf-8")

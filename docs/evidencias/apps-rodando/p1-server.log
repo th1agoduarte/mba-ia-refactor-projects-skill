@@ -1,0 +1,51 @@
+2026-11-15 12:51:40,259 WARNING src.config.settings: SECRET_KEY não definida; usando chave efêmera (sessões não sobrevivem a reinícios)
+2026-11-15 12:51:40,678 INFO __main__: Servidor iniciado em http://127.0.0.1:5000
+ * Serving Flask app 'src.app'
+ * Debug mode: off
+2026-11-15 12:51:40,682 INFO werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2026-11-15 12:51:40,682 INFO werkzeug: [33mPress CTRL+C to quit[0m
+2026-11-15 12:51:40,980 INFO werkzeug: 127.0.0.1 - - [15/Nov/2026 12:51:40] "GET / HTTP/1.1" 200 -
+2026-11-15 12:51:40,982 INFO werkzeug: 127.0.0.1 - - [15/Nov/2026 12:51:40] "GET /health HTTP/1.1" 200 -
+2026-11-15 12:51:40,983 INFO werkzeug: 127.0.0.1 - - [15/Nov/2026 12:51:40] "GET /produtos HTTP/1.1" 200 -
+2026-11-15 12:51:40,985 INFO werkzeug: 127.0.0.1 - - [15/Nov/2026 12:51:40] "GET /produtos/busca?q=Mouse HTTP/1.1" 200 -
+2026-11-15 12:51:40,987 INFO werkzeug: 127.0.0.1 - - [15/Nov/2026 12:51:40] "GET /produtos/busca?categoria=informatica&preco_min=100&preco_max=500 HTTP/1.1" 200 -
+2026-11-15 12:51:40,988 INFO werkzeug: 127.0.0.1 - - [15/Nov/2026 12:51:40] "GET /produtos/1 HTTP/1.1" 200 -
+2026-11-15 12:51:40,990 INFO werkzeug: 127.0.0.1 - - [15/Nov/2026 12:51:40] "[33mGET /produtos/9999 HTTP/1.1[0m" 404 -
+2026-11-15 12:51:41,005 INFO src.controllers.produto_controller: Produto criado com ID 11
+2026-11-15 12:51:41,005 INFO werkzeug: 127.0.0.1 - - [15/Nov/2026 12:51:41] "[35m[1mPOST /produtos HTTP/1.1[0m" 201 -
+2026-11-15 12:51:41,007 INFO werkzeug: 127.0.0.1 - - [15/Nov/2026 12:51:41] "[31m[1mPOST /produtos HTTP/1.1[0m" 400 -
+2026-11-15 12:51:41,008 INFO werkzeug: 127.0.0.1 - - [15/Nov/2026 12:51:41] "[31m[1mPOST /produtos HTTP/1.1[0m" 400 -
+2026-11-15 12:51:41,020 INFO werkzeug: 127.0.0.1 - - [15/Nov/2026 12:51:41] "PUT /produtos/1 HTTP/1.1" 200 -
+2026-11-15 12:51:41,032 INFO src.controllers.produto_controller: Produto 11 deletado
+2026-11-15 12:51:41,033 INFO werkzeug: 127.0.0.1 - - [15/Nov/2026 12:51:41] "DELETE /produtos/11 HTTP/1.1" 200 -
+2026-11-15 12:51:41,035 INFO werkzeug: 127.0.0.1 - - [15/Nov/2026 12:51:41] "[33mDELETE /produtos/9999 HTTP/1.1[0m" 404 -
+2026-11-15 12:51:41,037 INFO werkzeug: 127.0.0.1 - - [15/Nov/2026 12:51:41] "GET /usuarios HTTP/1.1" 200 -
+2026-11-15 12:51:41,039 INFO werkzeug: 127.0.0.1 - - [15/Nov/2026 12:51:41] "GET /usuarios/1 HTTP/1.1" 200 -
+2026-11-15 12:51:41,041 INFO werkzeug: 127.0.0.1 - - [15/Nov/2026 12:51:41] "[33mGET /usuarios/9999 HTTP/1.1[0m" 404 -
+2026-11-15 12:51:41,159 INFO src.controllers.usuario_controller: Usuário 4 criado
+2026-11-15 12:51:41,159 INFO werkzeug: 127.0.0.1 - - [15/Nov/2026 12:51:41] "[35m[1mPOST /usuarios HTTP/1.1[0m" 201 -
+2026-11-15 12:51:41,161 INFO werkzeug: 127.0.0.1 - - [15/Nov/2026 12:51:41] "[31m[1mPOST /usuarios HTTP/1.1[0m" 400 -
+2026-11-15 12:51:41,269 INFO src.controllers.usuario_controller: Login do usuário 2
+2026-11-15 12:51:41,270 INFO werkzeug: 127.0.0.1 - - [15/Nov/2026 12:51:41] "POST /login HTTP/1.1" 200 -
+2026-11-15 12:51:41,379 INFO src.controllers.usuario_controller: Login do usuário 4
+2026-11-15 12:51:41,379 INFO werkzeug: 127.0.0.1 - - [15/Nov/2026 12:51:41] "POST /login HTTP/1.1" 200 -
+2026-11-15 12:51:41,501 INFO src.controllers.usuario_controller: Falha de login
+2026-11-15 12:51:41,502 INFO werkzeug: 127.0.0.1 - - [15/Nov/2026 12:51:41] "[31m[1mPOST /login HTTP/1.1[0m" 401 -
+2026-11-15 12:51:41,509 INFO src.services.notification_service: Notificação [email]: Pedido 1 criado para usuário 2
+2026-11-15 12:51:41,509 INFO src.services.notification_service: Notificação [sms]: Pedido 1 criado para usuário 2
+2026-11-15 12:51:41,509 INFO src.services.notification_service: Notificação [push]: Pedido 1 criado para usuário 2
+2026-11-15 12:51:41,510 INFO werkzeug: 127.0.0.1 - - [15/Nov/2026 12:51:41] "[35m[1mPOST /pedidos HTTP/1.1[0m" 201 -
+2026-11-15 12:51:41,511 INFO werkzeug: 127.0.0.1 - - [15/Nov/2026 12:51:41] "[31m[1mPOST /pedidos HTTP/1.1[0m" 400 -
+2026-11-15 12:51:41,513 INFO werkzeug: 127.0.0.1 - - [15/Nov/2026 12:51:41] "[31m[1mPOST /pedidos HTTP/1.1[0m" 400 -
+2026-11-15 12:51:41,514 INFO werkzeug: 127.0.0.1 - - [15/Nov/2026 12:51:41] "GET /pedidos HTTP/1.1" 200 -
+2026-11-15 12:51:41,516 INFO werkzeug: 127.0.0.1 - - [15/Nov/2026 12:51:41] "GET /pedidos/usuario/2 HTTP/1.1" 200 -
+2026-11-15 12:51:41,522 INFO src.services.notification_service: Notificação [interno]: Pedido 1 foi aprovado! Preparar envio.
+2026-11-15 12:51:41,523 INFO werkzeug: 127.0.0.1 - - [15/Nov/2026 12:51:41] "PUT /pedidos/1/status HTTP/1.1" 200 -
+2026-11-15 12:51:41,524 INFO werkzeug: 127.0.0.1 - - [15/Nov/2026 12:51:41] "[31m[1mPUT /pedidos/1/status HTTP/1.1[0m" 400 -
+2026-11-15 12:51:41,526 INFO werkzeug: 127.0.0.1 - - [15/Nov/2026 12:51:41] "GET /relatorios/vendas HTTP/1.1" 200 -
+2026-11-15 12:51:41,527 INFO werkzeug: 127.0.0.1 - - [15/Nov/2026 12:51:41] "[31m[1mPOST /admin/query HTTP/1.1[0m" 401 -
+2026-11-15 12:51:41,529 INFO werkzeug: 127.0.0.1 - - [15/Nov/2026 12:51:41] "POST /admin/query HTTP/1.1" 200 -
+2026-11-15 12:51:41,530 INFO werkzeug: 127.0.0.1 - - [15/Nov/2026 12:51:41] "[31m[1mPOST /admin/reset-db HTTP/1.1[0m" 401 -
+2026-11-15 12:51:41,536 WARNING src.controllers.sistema_controller: Banco de dados resetado por administrador
+2026-11-15 12:51:41,537 INFO werkzeug: 127.0.0.1 - - [15/Nov/2026 12:51:41] "POST /admin/reset-db HTTP/1.1" 200 -

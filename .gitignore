@@ -13,3 +13,4 @@ instance/
 
 # Ferramentas do desafio
 tools/.*-server.log
+tools/.run-*.log

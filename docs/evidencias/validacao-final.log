@@ -1,0 +1,169 @@
+# make test — 2026-11-15 15:51 UTC
+Skill
+  ✓ code-smells-project/.claude/skills/refactor-arch/SKILL.md existe
+  ✓ ecommerce-api-legacy/.claude/skills/refactor-arch/SKILL.md existe
+  ✓ task-manager-api/.claude/skills/refactor-arch/SKILL.md existe
+  ✓ cópia em ecommerce-api-legacy idêntica à do projeto 1
+  ✓ cópia em task-manager-api idêntica à do projeto 1
+  ✓ frontmatter com name: refactor-arch
+  ✓ frontmatter com description
+  ✓ SKILL.md define a Fase 1 — Análise
+  ✓ SKILL.md define a Fase 2 — Auditoria
+  ✓ SKILL.md define a Fase 3 — Refatoração
+  ✓ Fase 2 termina pedindo confirmação [y/n]
+  ✓ Fases 1 e 2 declaradas somente leitura
+  ✓ Fase 3 valida boot + endpoints
+Referências (5 áreas de conhecimento, Markdown)
+  ✓ Análise de projeto: project-analysis.md
+  ✓ Catálogo de anti-patterns: anti-patterns-catalog.md
+  ✓ Template de relatório: report-template.md
+  ✓ Guidelines de arquitetura: mvc-guidelines.md
+  ✓ Playbook de refatoração: refactoring-playbook.md
+Catálogo
+  ✓ 23 anti-patterns (mínimo 8)
+  ✓ severidades distribuídas: ['CRITICAL', 'HIGH', 'LOW', 'MEDIUM']
+  ✓ inclui detecção de APIs deprecated com equivalente moderno
+  ✓ todo anti-pattern tem sinais de detecção
+Playbook
+  ✓ 14 transformações (mínimo 8)
+  ✓ 14/14 com código antes/depois
+Relatório reports/audit-project-1.md
+  ✓ segue o template (cabeçalho, Summary, Findings)
+  ✓ 21 findings (mínimo 5)
+  ✓ pelo menos 1 CRITICAL ou HIGH
+  ✓ ordenados CRITICAL → LOW
+  ✓ todo finding tem arquivo:linha
+  ✓ linha de Summary presente
+  ✓ Summary bate com a lista {'CRITICAL': 7, 'HIGH': 4, 'MEDIUM': 7, 'LOW': 3}
+  ✓ seção de APIs deprecated presente
+  ✓ termina com o pedido de confirmação
+Relatório reports/audit-project-2.md
+  ✓ segue o template (cabeçalho, Summary, Findings)
+  ✓ 18 findings (mínimo 5)
+  ✓ pelo menos 1 CRITICAL ou HIGH
+  ✓ ordenados CRITICAL → LOW
+  ✓ todo finding tem arquivo:linha
+  ✓ linha de Summary presente
+  ✓ Summary bate com a lista {'CRITICAL': 6, 'HIGH': 4, 'MEDIUM': 4, 'LOW': 4}
+  ✓ seção de APIs deprecated presente
+  ✓ termina com o pedido de confirmação
+Relatório reports/audit-project-3.md
+  ✓ segue o template (cabeçalho, Summary, Findings)
+  ✓ 19 findings (mínimo 5)
+  ✓ pelo menos 1 CRITICAL ou HIGH
+  ✓ ordenados CRITICAL → LOW
+  ✓ todo finding tem arquivo:linha
+  ✓ linha de Summary presente
+  ✓ Summary bate com a lista {'CRITICAL': 4, 'HIGH': 5, 'MEDIUM': 5, 'LOW': 5}
+  ✓ seção de APIs deprecated presente
+  ✓ termina com o pedido de confirmação
+
+✅ tudo ok
+Projeto: code-smells-project | comando: .venv/bin/python app.py
+✓ aplicação iniciou (porta aberta) | viva após os testes: True
+
+Endpoint                                                       antes depois  resultado
+GET /                                                            200    200  ✓ 
+GET /health                                                      200    200  ✓ 
+GET /produtos                                                    200    200  ✓ 
+GET /produtos/busca?q=Mouse                                      200    200  ✓ 
+GET /produtos/busca?categoria=informatica&preco_min=100&preco_   200    200  ✓ 
+GET /produtos/1                                                  200    200  ✓ 
+GET /produtos/9999                                               404    404  ✓ 
+POST /produtos                                                   201    201  ✓ 
+POST /produtos                                                   400    400  ✓ 
+POST /produtos                                                   400    400  ✓ 
+PUT /produtos/1                                                  200    200  ✓ 
+DELETE /produtos/11                                              200    200  ✓ 
+DELETE /produtos/9999                                            404    404  ✓ 
+GET /usuarios                                                    200    200  ✓ 
+GET /usuarios/1                                                  200    200  ✓ 
+GET /usuarios/9999                                               404    404  ✓ 
+POST /usuarios                                                   201    201  ✓ 
+POST /usuarios                                                   400    400  ✓ 
+POST /login                                                      200    200  ✓ 
+POST /login                                                      200    200  ✓ 
+POST /login                                                      401    401  ✓ 
+POST /pedidos                                                    201    201  ✓ 
+POST /pedidos                                                    400    400  ✓ 
+POST /pedidos                                                    400    400  ✓ 
+GET /pedidos                                                     200    200  ✓ 
+GET /pedidos/usuario/2                                           200    200  ✓ 
+PUT /pedidos/1/status                                            200    200  ✓ 
+PUT /pedidos/1/status                                            400    400  ✓ 
+GET /relatorios/vendas                                           200    200  ✓ 
+POST /admin/query                                                200    200  ✓ (sem token 401, com token 200)
+POST /admin/reset-db                                             200    200  ✓ (sem token 401, com token 200)
+
+Security (marcadores de vazamento nas respostas):
+  GET /health: antes=['secret_key', 'minha-chave-super-secreta'] depois=-
+  GET /usuarios: antes=['"senha"'] depois=-
+  GET /usuarios/1: antes=['"senha"'] depois=-
+
+31/31 endpoints com o contrato original preservado
+porta 3000 ocupada por outro processo; usando 3100 (PORT)
+Projeto: ecommerce-api-legacy | comando: npm start --silent
+✓ aplicação iniciou (porta aberta) | viva após os testes: True
+
+Endpoint                                                       antes depois  resultado
+POST /api/checkout                                               200    200  ✓ 
+POST /api/checkout                                               200    200  ✓ 
+POST /api/checkout                                               400    400  ✓ 
+POST /api/checkout                                               400    400  ✓ 
+POST /api/checkout                                               404    404  ✓ 
+GET /api/admin/financial-report                                  200    200  ✓ (sem token 401, com token 200)
+DELETE /api/users/1                                              200    200  ✓ (sem token 401, com token 200)
+
+Security (marcadores de vazamento nas respostas):
+
+7/7 endpoints com o contrato original preservado
+Projeto: task-manager-api | comando: .venv/bin/python app.py
+✓ aplicação iniciou (porta aberta) | viva após os testes: True
+
+Endpoint                                                       antes depois  resultado
+GET /                                                            200    200  ✓ 
+GET /health                                                      200    200  ✓ 
+GET /tasks                                                       200    200  ✓ 
+GET /tasks/1                                                     200    200  ✓ 
+GET /tasks/9999                                                  404    404  ✓ 
+GET /tasks/search?q=a                                            200    200  ✓ 
+GET /tasks/search?status=pending&priority=1                      200    200  ✓ 
+GET /tasks/stats                                                 200    200  ✓ 
+POST /tasks                                                      201    201  ✓ 
+POST /tasks                                                      400    400  ✓ 
+POST /tasks                                                      400    400  ✓ 
+POST /tasks                                                      400    400  ✓ 
+PUT /tasks/1                                                     200    200  ✓ 
+PUT /tasks/1                                                     400    400  ✓ 
+PUT /tasks/9999                                                  404    404  ✓ 
+GET /users                                                       200    200  ✓ 
+GET /users/1                                                     200    200  ✓ 
+GET /users/9999                                                  404    404  ✓ 
+POST /users                                                      201    201  ✓ 
+POST /users                                                      409    409  ✓ 
+POST /users                                                      400    400  ✓ 
+PUT /users/2                                                     200    200  ✓ 
+GET /users/1/tasks                                               200    200  ✓ 
+POST /login                                                      200    200  ✓ 
+POST /login                                                      200    200  ✓ 
+POST /login                                                      401    401  ✓ 
+GET /reports/summary                                             200    200  ✓ 
+GET /reports/user/1                                              200    200  ✓ 
+GET /reports/user/9999                                           404    404  ✓ 
+GET /categories                                                  200    200  ✓ 
+POST /categories                                                 201    201  ✓ 
+POST /categories                                                 400    400  ✓ 
+PUT /categories/1                                                200    200  ✓ 
+DELETE /tasks/2                                                  200    200  ✓ 
+DELETE /users/3                                                  200    200  ✓ (sem token 401, com token 200)
+DELETE /categories/9999                                          404    404  ✓ 
+
+Security (marcadores de vazamento nas respostas):
+  GET /users/1: antes=['"password"'] depois=-
+  POST /users: antes=['"password"'] depois=-
+  PUT /users/2: antes=['"password"'] depois=-
+  POST /login: antes=['"password"'] depois=-
+  POST /login: antes=['"password"'] depois=-
+
+36/36 endpoints com o contrato original preservado
+exit=0
