@@ -10,3 +10,6 @@ venv/
 # SQLite
 *.db
 instance/
+
+# Ferramentas do desafio
+tools/.*-server.log

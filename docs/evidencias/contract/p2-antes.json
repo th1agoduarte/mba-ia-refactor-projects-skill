@@ -1,0 +1,122 @@
+{
+  "project": "ecommerce-api-legacy",
+  "command": "npm start --silent",
+  "booted": true,
+  "booted_alive": true,
+  "results": [
+    {
+      "method": "POST",
+      "path": "/api/checkout",
+      "body": {
+        "usr": "Guilherme",
+        "eml": "gui@fullcycle.com.br",
+        "pwd": "senhaforte",
+        "c_id": 2,
+        "card": "4111222233334444"
+      },
+      "allowed": null,
+      "status": 200,
+      "response": {
+        "msg": "Sucesso",
+        "enrollment_id": 2
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/checkout",
+      "body": {
+        "usr": "Leonan",
+        "eml": "leonan@fullcycle.com.br",
+        "pwd": "123",
+        "c_id": 2,
+        "card": "4111222233334444"
+      },
+      "allowed": null,
+      "status": 200,
+      "response": {
+        "msg": "Sucesso",
+        "enrollment_id": 3
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/checkout",
+      "body": {
+        "usr": "João",
+        "eml": "joao@teste.com",
+        "pwd": "123",
+        "c_id": 1,
+        "card": "5111222233334444"
+      },
+      "allowed": null,
+      "status": 400,
+      "response": "Pagamento recusado"
+    },
+    {
+      "method": "POST",
+      "path": "/api/checkout",
+      "body": {
+        "usr": "X",
+        "eml": "x@x.com"
+      },
+      "allowed": null,
+      "status": 400,
+      "response": "Bad Request"
+    },
+    {
+      "method": "POST",
+      "path": "/api/checkout",
+      "body": {
+        "usr": "X",
+        "eml": "x@x.com",
+        "pwd": "1",
+        "c_id": 999,
+        "card": "4111"
+      },
+      "allowed": null,
+      "status": 404,
+      "response": "Curso não encontrado"
+    },
+    {
+      "method": "GET",
+      "path": "/api/admin/financial-report",
+      "body": null,
+      "allowed": null,
+      "status": 200,
+      "response": [
+        {
+          "course": "Clean Architecture",
+          "revenue": 997,
+          "students": [
+            {
+              "student": "Leonan",
+              "paid": 997
+            }
+          ]
+        },
+        {
+          "course": "Docker",
+          "revenue": 994,
+          "students": [
+            {
+              "student": "Leonan",
+              "paid": 497
+            },
+            {
+              "student": "Guilherme",
+              "paid": 497
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/users/1",
+      "body": null,
+      "allowed": null,
+      "status": 200,
+      "response": "Usuário deletado, mas as matrículas e pagamentos ficaram sujos no banco."
+    }
+  ]
+}
